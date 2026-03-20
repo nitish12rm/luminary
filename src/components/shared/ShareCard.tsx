@@ -5,12 +5,42 @@ import { motion } from "framer-motion";
 import { ICouple } from "@/types";
 import { formatDate, getDays } from "@/lib/utils";
 
-/* ─── theme palettes for canvas drawing ─── */
-const CARD_THEMES: Record<string, { bgA: string; bgB: string; bgC: string; accent: string; text: string }> = {
-  blush:     { bgA: "#1a0018", bgB: "#3d0030", bgC: "#160025", accent: "#e8789a", text: "#fff0f6" },
-  golden:    { bgA: "#1a1000", bgB: "#3d2800", bgC: "#160a00", accent: "#d4a017", text: "#fffaf0" },
-  velvet:    { bgA: "#0c071a", bgB: "#1a0a38", bgC: "#070614", accent: "#9b5fe0", text: "#f0e8ff" },
-  scrapbook: { bgA: "#1a1230", bgB: "#2e1a50", bgC: "#100a28", accent: "#ff4da6", text: "#fff0fa" },
+/* ─── Per-theme palette for canvas PNG download ─── */
+interface ThemePal {
+  bgA: string; bgB: string; bgC: string;
+  accent: string;
+  text: string;   /* primary text */
+  muted: string;  /* secondary/muted text */
+  panelBg: string;   /* rgba for glass panel fill */
+  panelBorder: string;
+  isDark: boolean;
+}
+
+const CARD_THEMES: Record<string, ThemePal> = {
+  blush: {
+    bgA: "#fef6f8", bgB: "#fde8f0", bgC: "#ede0ff",
+    accent: "#e8789a", text: "#2d1520", muted: "#7a5468",
+    panelBg: "rgba(255,248,252,0.82)", panelBorder: "rgba(232,120,154,0.22)",
+    isDark: false,
+  },
+  golden: {
+    bgA: "#fffbf0", bgB: "#fff0c0", bgC: "#ffe4b0",
+    accent: "#d4a017", text: "#2a1f00", muted: "#7a5a20",
+    panelBg: "rgba(255,252,240,0.82)", panelBorder: "rgba(212,160,23,0.22)",
+    isDark: false,
+  },
+  velvet: {
+    bgA: "#0f0a1a", bgB: "#1a0a38", bgC: "#0a1428",
+    accent: "#9b5fe0", text: "#f0e8ff", muted: "#a08ac0",
+    panelBg: "rgba(26,16,48,0.75)", panelBorder: "rgba(155,95,224,0.28)",
+    isDark: true,
+  },
+  scrapbook: {
+    bgA: "#fef8e8", bgB: "#fff0f8", bgC: "#f4f0ff",
+    accent: "#ff4da6", text: "#1a1228", muted: "#7a5868",
+    panelBg: "rgba(255,255,255,0.85)", panelBorder: "rgba(255,77,166,0.22)",
+    isDark: false,
+  },
 };
 
 /* ─── props ─── */
@@ -78,7 +108,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, W, H);
 
-      // radial glow blobs
+      // subtle radial glow blobs
       const drawBlob = (x: number, y: number, r: number, hex: string, alpha: number) => {
         const radial = ctx.createRadialGradient(x, y, 0, x, y, r);
         const a = Math.round(alpha * 255).toString(16).padStart(2, "0");
@@ -91,20 +121,21 @@ export default function ShareCard({ couple, totalMoments }: Props) {
         ctx.fill();
         ctx.restore();
       };
-      drawBlob(120, 140, 200, pal.accent, 0.3);
-      drawBlob(W - 100, H - 100, 160, pal.accent, 0.2);
+      const blobAlpha = pal.isDark ? 0.32 : 0.18;
+      drawBlob(120, 140, 200, pal.accent, blobAlpha);
+      drawBlob(W - 100, H - 100, 160, pal.accent, blobAlpha * 0.65);
 
       // left glass panel
       const px = 48, py = 48, pw = W - 316, ph = H - 96;
       ctx.save();
-      ctx.globalAlpha = 0.12;
-      ctx.fillStyle = "#ffffff";
+      ctx.globalAlpha = pal.isDark ? 0.12 : 0.5;
+      ctx.fillStyle = pal.isDark ? "#ffffff" : "#ffffff";
       roundRect(ctx, px, py, pw, ph, 20);
       ctx.fill();
       ctx.restore();
       ctx.save();
-      ctx.strokeStyle = "rgba(255,255,255,0.15)";
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = pal.panelBorder;
+      ctx.lineWidth = 1.5;
       roundRect(ctx, px, py, pw, ph, 20);
       ctx.stroke();
       ctx.restore();
@@ -122,8 +153,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.font = `300 ${nameSize}px Georgia, 'Times New Roman', serif`;
       ctx.fillText(
         `${couple.partner1Name}  &  ${couple.partner2Name}`,
-        px + 32, py + 100,
-        pw - 64
+        px + 32, py + 100, pw - 64
       );
 
       // accent underline
@@ -134,13 +164,13 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.fillRect(px + 32, py + 114, 80, 2);
 
       // since date
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.55)" : `${pal.muted}cc`;
       ctx.font = "italic 16px Georgia, serif";
       ctx.fillText(`Since ${formatDate(couple.startDate)}`, px + 32, py + 152);
 
-      // bio (truncated)
+      // bio
       if (couple.bio) {
-        ctx.fillStyle = "rgba(255,255,255,0.35)";
+        ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.35)" : `${pal.muted}88`;
         ctx.font = "14px Arial, sans-serif";
         const maxW = pw - 80;
         let bioLine = "";
@@ -154,7 +184,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
 
       // stats row
       const statsY = py + ph - 68;
-      ctx.strokeStyle = "rgba(255,255,255,0.1)";
+      ctx.strokeStyle = pal.isDark ? "rgba(255,255,255,0.1)" : `${pal.accent}30`;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(px + 32, statsY - 16);
@@ -171,7 +201,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
         ctx.fillStyle = pal.accent;
         ctx.font = "600 22px Arial, sans-serif";
         ctx.fillText(s.val, sx, statsY);
-        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.4)" : `${pal.muted}bb`;
         ctx.font = "12px Arial, sans-serif";
         ctx.fillText(s.label, sx, statsY + 20);
         sx += 120;
@@ -180,19 +210,19 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       // QR panel
       const qx = W - 256, qy = 48, qw = 208, qh = H - 96;
       ctx.save();
-      ctx.globalAlpha = 0.1;
+      ctx.globalAlpha = pal.isDark ? 0.1 : 0.45;
       ctx.fillStyle = "#ffffff";
       roundRect(ctx, qx, qy, qw, qh, 20);
       ctx.fill();
       ctx.restore();
       ctx.save();
-      ctx.strokeStyle = "rgba(255,255,255,0.12)";
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = pal.panelBorder;
+      ctx.lineWidth = 1.5;
       roundRect(ctx, qx, qy, qw, qh, 20);
       ctx.stroke();
       ctx.restore();
 
-      ctx.fillStyle = "rgba(255,255,255,0.4)";
+      ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.4)" : `${pal.muted}99`;
       ctx.font = "11px Arial, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("SCAN TO VISIT", qx + qw / 2, qy + 32);
@@ -224,12 +254,11 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.textAlign = "center";
       ctx.fillText("\u2665", qx + qw / 2, qrY + qrSize + 40);
 
-      ctx.fillStyle = "rgba(255,255,255,0.25)";
+      ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.25)" : `${pal.muted}66`;
       ctx.font = "11px Arial, sans-serif";
       ctx.fillText("luminary.love", qx + qw / 2, qrY + qrSize + 60);
       ctx.textAlign = "left";
 
-      // trigger download
       const link = document.createElement("a");
       link.download = `${couple.partner1Name}-${couple.partner2Name}-luminary.png`;
       link.href = canvas.toDataURL("image/png");
@@ -251,17 +280,14 @@ export default function ShareCard({ couple, totalMoments }: Props) {
         journeyUrl={journeyUrl}
       />
 
+      {/* Download button — inherits theme accent */}
       <motion.button
         onClick={handleDownload}
         disabled={downloading}
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
-        className="mt-6 mx-auto flex items-center gap-3 px-8 py-3.5 rounded-full font-medium text-white"
-        style={{
-          background: `linear-gradient(135deg, ${pal.accent}, ${pal.bgB})`,
-          boxShadow: `0 8px 32px ${pal.accent}40`,
-          fontSize: "15px",
-        }}
+        className="btn-accent mt-6 mx-auto flex items-center gap-2.5"
+        style={{ paddingLeft: "2rem", paddingRight: "2rem", paddingTop: "0.85rem", paddingBottom: "0.85rem" }}
       >
         {downloading ? (
           <>
@@ -270,7 +296,11 @@ export default function ShareCard({ couple, totalMoments }: Props) {
           </>
         ) : (
           <>
-            <span>⬇</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
             Download Card
           </>
         )}
@@ -280,7 +310,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
 }
 
 /* ══════════════════════════════════════════════
-   ShareCardModal — floating trigger for JourneyHero
+   ShareCardModal — floating trigger for journey page
    ══════════════════════════════════════════════ */
 export function ShareCardModal({ couple, totalMoments }: { couple: ICouple; totalMoments: number }) {
   const [open, setOpen] = useState(false);
@@ -317,7 +347,7 @@ export function ShareCardModal({ couple, totalMoments }: { couple: ICouple; tota
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)" }}
+          style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
           onClick={() => setOpen(false)}
         >
           <motion.div
@@ -327,11 +357,14 @@ export function ShareCardModal({ couple, totalMoments }: { couple: ICouple; tota
             onClick={(e) => e.stopPropagation()}
             className="flex flex-col items-center w-full max-w-xl"
           >
-            <div className="w-full mb-3 flex justify-end">
+            <div className="w-full mb-3 flex justify-between items-center">
+              <p style={{ fontSize: "11px", letterSpacing: "0.2em", color: "var(--text-muted)", textTransform: "uppercase" }}>
+                Share your journey
+              </p>
               <button
                 onClick={() => setOpen(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-colors"
-                style={{ background: "rgba(255,255,255,0.1)" }}
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                style={{ background: "var(--bg-card)", color: "var(--text-muted)", border: "1px solid var(--border-subtle)" }}
               >
                 ✕
               </button>
@@ -345,12 +378,12 @@ export function ShareCardModal({ couple, totalMoments }: { couple: ICouple; tota
 }
 
 /* ══════════════════════════════════════════════
-   CardPreview — CSS-rendered card (visual preview)
+   CardPreview — CSS card using theme CSS variables
    ══════════════════════════════════════════════ */
 interface PreviewProps {
   couple: ICouple;
   totalMoments: number;
-  pal: { bgA: string; bgB: string; bgC: string; accent: string; text: string };
+  pal: ThemePal;
   days: number;
   duration: string;
   journeyUrl: string;
@@ -371,98 +404,83 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
         style={{
           aspectRatio: "9 / 5",
           borderRadius: "20px",
-          background: `linear-gradient(135deg, ${pal.bgA} 0%, ${pal.bgB} 55%, ${pal.bgC} 100%)`,
-          boxShadow: `0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)`,
-          fontFamily: "Georgia, 'Times New Roman', serif",
+          background: "var(--hero-gradient)",
+          boxShadow: "var(--shadow-card), 0 0 0 1px var(--border-subtle)",
         }}
       >
-        {/* glow blobs */}
-        <div
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            width: "45%", height: "80%",
-            top: "-20%", left: "-10%",
-            background: `radial-gradient(circle, ${pal.accent}50 0%, transparent 70%)`,
-            filter: "blur(40px)",
-          }}
-        />
-        <div
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            width: "35%", height: "60%",
-            bottom: "-20%", right: "28%",
-            background: `radial-gradient(circle, ${pal.accent}30 0%, transparent 70%)`,
-            filter: "blur(32px)",
-          }}
-        />
+        {/* accent glow blobs */}
+        <div className="absolute rounded-full pointer-events-none" style={{
+          width: "45%", height: "80%", top: "-20%", left: "-10%",
+          background: "radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)",
+          filter: "blur(40px)",
+        }} />
+        <div className="absolute rounded-full pointer-events-none" style={{
+          width: "30%", height: "55%", bottom: "-15%", right: "28%",
+          background: "radial-gradient(circle, var(--secondary-glow) 0%, transparent 70%)",
+          filter: "blur(32px)",
+        }} />
 
         {/* left panel */}
         <div
           className="absolute inset-y-0 left-0 flex flex-col justify-between"
-          style={{ width: "63%", padding: "7%" }}
+          style={{
+            width: "63%", padding: "7%",
+            background: pal.isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.45)",
+            borderRight: "1px solid var(--border-subtle)",
+            backdropFilter: "blur(12px)",
+          }}
         >
           {/* label */}
-          <div
-            style={{
-              fontSize: "clamp(7px, 1.1vw, 10px)",
-              fontWeight: 500,
-              letterSpacing: "0.3em",
-              color: pal.accent,
-              opacity: 0.9,
-              fontFamily: "Arial, sans-serif",
-            }}
-          >
+          <div style={{
+            fontSize: "clamp(7px, 1.1vw, 10px)",
+            fontWeight: 500,
+            letterSpacing: "0.3em",
+            color: "var(--accent-1)",
+            opacity: 0.9,
+            fontFamily: "var(--font-ui)",
+          }}>
             L U M I N A R Y  ♥
           </div>
 
           {/* names + date */}
           <div>
-            <div
-              style={{
-                fontFamily: "Georgia, 'Times New Roman', serif",
-                fontWeight: 300,
-                fontSize: "clamp(16px, 3.6vw, 40px)",
-                color: pal.text,
-                lineHeight: 1.1,
-                marginBottom: "clamp(6px, 1vw, 12px)",
-              }}
-            >
+            <div style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 300,
+              fontSize: "clamp(16px, 3.6vw, 40px)",
+              color: "var(--text-primary)",
+              lineHeight: 1.1,
+              marginBottom: "clamp(6px, 1vw, 12px)",
+            }}>
               {couple.partner1Name}
-              <span style={{ opacity: 0.45 }}> & </span>
+              <span style={{ color: "var(--text-muted)" }}> & </span>
               {couple.partner2Name}
             </div>
-            <div
-              style={{
-                width: "clamp(36px, 7%, 64px)",
-                height: "2px",
-                background: `linear-gradient(to right, ${pal.accent}, transparent)`,
-                marginBottom: "clamp(6px, 1.2vw, 12px)",
-              }}
-            />
-            <div
-              style={{
-                fontFamily: "Georgia, serif",
-                fontStyle: "italic",
-                fontSize: "clamp(9px, 1.4vw, 13px)",
-                color: "rgba(255,255,255,0.5)",
-              }}
-            >
+            <div style={{
+              width: "clamp(36px, 7%, 64px)", height: "2px",
+              background: "var(--timeline-line)",
+              marginBottom: "clamp(6px, 1.2vw, 12px)",
+            }} />
+            <div style={{
+              fontFamily: "var(--font-display)",
+              fontStyle: "italic",
+              fontSize: "clamp(9px, 1.4vw, 13px)",
+              color: "var(--text-secondary)",
+            }}>
               Since {formatDate(couple.startDate)}
             </div>
             {couple.bio && (
-              <div
-                style={{
-                  fontFamily: "Arial, sans-serif",
-                  fontSize: "clamp(8px, 1.1vw, 11px)",
-                  color: "rgba(255,255,255,0.28)",
-                  marginTop: "clamp(4px, 0.8vw, 8px)",
-                  overflow: "hidden",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  maxWidth: "85%",
-                }}
-              >
+              <div style={{
+                fontFamily: "var(--font-ui)",
+                fontSize: "clamp(8px, 1.1vw, 11px)",
+                color: "var(--text-muted)",
+                marginTop: "clamp(4px, 0.8vw, 8px)",
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                maxWidth: "85%",
+              }}>
                 {couple.bio}
               </div>
             )}
@@ -470,29 +488,25 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
 
           {/* stats */}
           <div>
-            <div style={{ height: "1px", background: "rgba(255,255,255,0.1)", marginBottom: "clamp(6px, 1.2vw, 12px)" }} />
+            <div style={{ height: "1px", background: "var(--border-subtle)", marginBottom: "clamp(6px, 1.2vw, 12px)" }} />
             <div className="flex items-end gap-[5%]">
               {stats.map((s) => (
                 <div key={s.label}>
-                  <div
-                    style={{
-                      fontFamily: "Arial, sans-serif",
-                      fontWeight: 600,
-                      fontSize: "clamp(11px, 1.9vw, 18px)",
-                      color: pal.accent,
-                      lineHeight: 1,
-                    }}
-                  >
+                  <div style={{
+                    fontFamily: "var(--font-ui)",
+                    fontWeight: 600,
+                    fontSize: "clamp(11px, 1.9vw, 18px)",
+                    color: "var(--accent-1)",
+                    lineHeight: 1,
+                  }}>
                     {s.val}
                   </div>
-                  <div
-                    style={{
-                      fontFamily: "Arial, sans-serif",
-                      fontSize: "clamp(6px, 0.9vw, 9px)",
-                      color: "rgba(255,255,255,0.33)",
-                      marginTop: "2px",
-                    }}
-                  >
+                  <div style={{
+                    fontFamily: "var(--font-ui)",
+                    fontSize: "clamp(6px, 0.9vw, 9px)",
+                    color: "var(--text-muted)",
+                    marginTop: "2px",
+                  }}>
                     {s.label}
                   </div>
                 </div>
@@ -506,36 +520,34 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
           className="absolute inset-y-0 right-0 flex flex-col items-center justify-center"
           style={{
             width: "35%",
-            background: "rgba(255,255,255,0.05)",
-            borderLeft: "1px solid rgba(255,255,255,0.08)",
+            background: pal.isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.38)",
+            backdropFilter: "blur(12px)",
+            borderLeft: "1px solid var(--border-subtle)",
             gap: "clamp(6px, 1.5vw, 14px)",
             padding: "5%",
           }}
         >
-          <div
-            style={{
-              fontFamily: "Arial, sans-serif",
-              fontSize: "clamp(6px, 0.95vw, 9px)",
-              fontWeight: 500,
-              letterSpacing: "0.18em",
-              color: "rgba(255,255,255,0.35)",
-              textAlign: "center",
-              lineHeight: 1.7,
-            }}
-          >
+          <div style={{
+            fontFamily: "var(--font-ui)",
+            fontSize: "clamp(6px, 0.95vw, 9px)",
+            fontWeight: 500,
+            letterSpacing: "0.18em",
+            color: "var(--text-muted)",
+            textAlign: "center",
+            lineHeight: 1.7,
+          }}>
             SCAN TO VISIT<br />OUR JOURNEY
           </div>
 
           {/* QR image */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: "clamp(6px, 1vw, 10px)",
-              padding: "clamp(4px, 0.8vw, 7px)",
-              width: "clamp(52px, 11vw, 100px)",
-              height: "clamp(52px, 11vw, 100px)",
-            }}
-          >
+          <div style={{
+            background: "white",
+            borderRadius: "clamp(6px, 1vw, 10px)",
+            padding: "clamp(4px, 0.8vw, 7px)",
+            width: "clamp(52px, 11vw, 100px)",
+            height: "clamp(52px, 11vw, 100px)",
+            boxShadow: "0 2px 12px var(--accent-glow)",
+          }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`/api/qr?url=${encodeURIComponent(journeyUrl)}`}
@@ -544,16 +556,14 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             />
           </div>
 
-          <div style={{ fontSize: "clamp(12px, 1.8vw, 18px)", color: pal.accent }}>♥</div>
+          <div style={{ fontSize: "clamp(12px, 1.8vw, 18px)", color: "var(--accent-1)" }}>♥</div>
 
-          <div
-            style={{
-              fontFamily: "Arial, sans-serif",
-              fontSize: "clamp(6px, 0.9vw, 9px)",
-              color: "rgba(255,255,255,0.2)",
-              letterSpacing: "0.1em",
-            }}
-          >
+          <div style={{
+            fontFamily: "var(--font-ui)",
+            fontSize: "clamp(6px, 0.9vw, 9px)",
+            color: "var(--text-muted)",
+            letterSpacing: "0.1em",
+          }}>
             luminary.love
           </div>
         </div>
