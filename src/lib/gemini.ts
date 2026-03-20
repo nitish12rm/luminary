@@ -20,7 +20,7 @@ export async function enhanceMoment(params: {
   date: string;
 }): Promise<string> {
   const ai = getGenAI();
-  const modelName = process.env.GEMINI_MODEL || "gemini-1.5-flash";
+  const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash";
   const model = ai.getGenerativeModel({
     model: modelName,
     generationConfig: {
