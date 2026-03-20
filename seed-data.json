@@ -1,0 +1,84 @@
+{
+  "couple": {
+    "accessCode": "meera24",
+    "partner1Name": "Meera",
+    "partner2Name": "Rohan",
+    "startDate": "2023-03-18",
+    "theme": "blush",
+    "bio": "Two people who were too busy living their own stories — until they became each other's."
+  },
+  "moments": [
+    {
+      "category": "first_meeting",
+      "customLabel": "",
+      "date": "2022-09-10",
+      "hasPhoto": true,
+      "rawDescription": "We met at a mutual friend's farewell party. I was by the bookshelf pretending to look at titles I'd already read. He walked over and pulled out the exact book I was faking interest in and said 'this one's actually worth it'. We argued about the ending for forty minutes.",
+      "poeticNarrative": "You found each other in the margin between small talk and something real — a bookshelf, a familiar spine, and forty minutes that dissolved the room around you. He pulled out the very title you had been pretending to consider, and what followed wasn't a conversation so much as a collision, warm and unhurried, of two people who read the world the same way. By the time the party thinned, neither of you had noticed it go."
+    },
+    {
+      "category": "first_conversation",
+      "customLabel": "",
+      "date": "2022-09-18",
+      "hasPhoto": false,
+      "rawDescription": "He texted eight days after the party. We started at 9pm talking about the book and ended at 2am talking about everything else — childhood, career fears, what we want our lives to actually feel like. I remember lying on my bedroom floor just talking.",
+      "poeticNarrative": "Eight days passed, and then his name appeared on your screen with the quiet confidence of someone who had been thinking it through. What began with the book became a wandering conversation that crossed childhood memories, half-formed ambitions, and the tender uncertainty of wanting more than what already was. By 2am you were lying on your bedroom floor, not sleepy, only full."
+    },
+    {
+      "category": "first_walk",
+      "customLabel": "",
+      "date": "2022-10-02",
+      "hasPhoto": true,
+      "rawDescription": "We met at the lake near his neighbourhood on a Sunday. It was overcast, about to rain. We walked anyway and it started drizzling halfway through. We sat under a tree and he shared his umbrella even though it was too small for both of us. We were both half-drenched. It was perfect.",
+      "poeticNarrative": "The sky had already made up its mind by the time you reached the lake, and so had you both — you walked anyway. The drizzle caught you midway, and beneath a tree too small for shelter and an umbrella too small for two, you sat close enough that the rain barely mattered. There are afternoons that ask nothing of you and give everything; this was one of them."
+    },
+    {
+      "category": "knowing_feelings",
+      "customLabel": "",
+      "date": "2022-11-05",
+      "hasPhoto": false,
+      "rawDescription": "He drove 45 minutes to bring me medicine when I had a bad migraine. I hadn't asked him to. He sat outside my door because I said I didn't want company, left the medicine with a note that just said 'drink water, no screens'. I read that note three times.",
+      "poeticNarrative": "You hadn't asked him to come, and yet forty-five minutes of driving later, there was a knock at your door — quiet, unhurried, leaving room for you to say no. He left the medicine and a note that said only what was needed, nothing performed, nothing borrowed from romance. You read it three times not because the words were complex, but because something in you already knew what they meant."
+    },
+    {
+      "category": "proposal",
+      "customLabel": "",
+      "date": "2023-03-18",
+      "hasPhoto": true,
+      "rawDescription": "He took me to the same lake where we walked in the rain. He'd brought a small picnic. He wasn't dramatic about it — he just said he'd been thinking for a while that he wanted this to be official, that he wanted to be mine. He asked if I'd be his girlfriend. I said yes immediately and then cried a little.",
+      "poeticNarrative": "He chose the same lake where the rain had caught you both, the same ordinary ground where something had quietly begun — and that choice said more than any grand gesture could. The picnic was simple, the words were plain, and when he said he wanted to make it official, that he simply wanted to be yours, your answer was already leaving your mouth before he'd finished asking. The tears that followed were not sadness; they were the body's way of marking something it knows is true."
+    },
+    {
+      "category": "first_kiss",
+      "customLabel": "",
+      "date": "2023-03-18",
+      "hasPhoto": false,
+      "rawDescription": "Same evening, same lake. After he asked me and I said yes, we sat there for a while just smiling like idiots. And then at some point it just happened. There was no lead-up, no dramatic moment. It was just the most natural, quiet thing.",
+      "poeticNarrative": "There was no ceremony to it — just the two of you sitting in the blue hour by the water, smiling in the private way of people who have just said something that can't be unsaid. And then the small remaining distance between you closed, not with declaration but with the ease of something that had been waiting to be obvious. It was quiet, and simple, and entirely yours."
+    },
+    {
+      "category": "first_date",
+      "customLabel": "",
+      "date": "2023-03-25",
+      "hasPhoto": true,
+      "rawDescription": "We went to a small South Indian restaurant in Bandra. He had researched it — knew the menu, had a recommendation ready. We shared a masala dosa and ordered extra sambar. He spilled filter coffee on himself during the conversation and pretended it hadn't happened. I laughed for five minutes straight.",
+      "poeticNarrative": "He had researched the restaurant the way he did most things — quietly, thoughtfully, arriving with a recommendation already in hand — and the evening unfolded in shared dosa and a warmth that had nothing to do with the filter coffee. When it tipped and soaked his sleeve and he looked up with perfect composure as though nothing had occurred, you laughed until the table beside you turned to look, and even then you couldn't stop. You drove home knowing this was the first of many ordinary evenings you would want to keep forever."
+    },
+    {
+      "category": "first_fight",
+      "customLabel": "",
+      "date": "2023-05-12",
+      "hasPhoto": false,
+      "rawDescription": "I felt like he was always making plans without checking with me first. He thought I was being controlling. We said sharp things. Three days of silence. He called on the third night and said he understood now, that he should have been more considerate. I said I should have spoken earlier instead of building resentment. We were both right.",
+      "poeticNarrative": "The silence lasted three days, which felt long enough to wonder, and short enough to survive. What had started as bruised feelings became sharp words, the kind that clarify things you didn't know were unclear. He called on the third night — not to win, but to understand — and you met him halfway with your own accounting of what you could have done differently. That is how you learned that repair between two good people sounds less like an apology and more like two people deciding to stay."
+    },
+    {
+      "category": "custom",
+      "customLabel": "First Trip Together",
+      "date": "2023-08-04",
+      "hasPhoto": true,
+      "rawDescription": "Goa, four days. We stayed at a tiny guesthouse in Anjuna. He woke up early every morning to watch the sunrise, which surprised me because I thought he was a late riser. We hired a scooter, got lost, found the best fish thali by accident, swam in the sea at 7pm when no one was around. On the last night he said he couldn't imagine doing this with anyone else.",
+      "poeticNarrative": "Goa gave you four days and you spent each one as though it were something to be savoured rather than used up — the scooter rides with no fixed destination, the fish thali found only because you were lost, the empty sea at seven in the evening that belonged entirely to you both. He rose each morning before you to watch the sun come up, which you hadn't expected, and which quietly rearranged something in how you saw him. On the last night he said he couldn't imagine this with anyone else, and you understood that some things, once said under the right sky, become permanent."
+    }
+  ]
+}
