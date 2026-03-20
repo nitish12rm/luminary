@@ -155,6 +155,14 @@ export default function EntryScreen() {
           <Link href="/setup" className="text-sm font-medium" style={{ color: "var(--accent-1)" }}>
             Start your journey →
           </Link>
+          <button
+            onClick={() => code.trim().length >= 3 && router.push(`/edit/${code.trim()}`)}
+            disabled={code.trim().length < 3}
+            className="text-xs mt-3 block mx-auto underline underline-offset-2 transition-opacity disabled:no-underline disabled:cursor-default"
+            style={{ color: "var(--text-muted)", opacity: code.trim().length >= 3 ? 0.8 : 0.4 }}
+          >
+            Edit your memories
+          </button>
         </div>
       </motion.div>
 
