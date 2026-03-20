@@ -250,7 +250,7 @@ export default function ThemeSwitcher({ defaultTheme, coupleId, couple, totalMom
               ✕
             </button>
           </div>
-          <ShareCard couple={couple} totalMoments={totalMoments ?? 0} />
+          <ShareCard couple={couple} totalMoments={totalMoments ?? 0} activeTheme={active} />
         </motion.div>
       </motion.div>
     )}
