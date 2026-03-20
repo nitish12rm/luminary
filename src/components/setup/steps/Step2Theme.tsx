@@ -50,7 +50,7 @@ export default function Step2Theme({ couple, updateCouple, onNext, onBack }: Pro
                 className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
                 style={{ background: theme.preview.accent + "20", color: theme.preview.accent }}
               >
-                {theme.id === "blush" ? "🌸" : theme.id === "golden" ? "✨" : "🌙"}
+                {theme.id === "blush" ? "🌸" : theme.id === "golden" ? "✨" : theme.id === "velvet" ? "🌙" : "✂️"}
               </div>
 
               <div className="flex-1 min-w-0">

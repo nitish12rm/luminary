@@ -1,4 +1,4 @@
-export type ThemeId = "blush" | "golden" | "velvet";
+export type ThemeId = "blush" | "golden" | "velvet" | "scrapbook";
 
 export type MomentCategory =
   | "first_meeting"

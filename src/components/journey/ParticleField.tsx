@@ -138,9 +138,49 @@ function FloatingStars() {
   );
 }
 
+// ── Scrapbook: floating glitter ──
+function ScrapbookGlitter() {
+  const particles = useParticles(44);
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      {particles.map((p) => {
+        const symbols = ["✦", "✧", "★", "✩", "◆", "◇", "✱", "✲", "❋", "·", "♥", "✿"];
+        const colors  = [
+          "var(--particle-a)", "var(--particle-b)", "var(--particle-c)",
+          "#40c8c0", "#ff8fcc", "#ffb3e0", "#ffe566", "#c77dff",
+        ];
+        const sym   = symbols[p.id % symbols.length];
+        const color = colors[p.id % colors.length];
+        const top   = ((p.id * 13 + 8) % 88) + 4; // deterministic vertical spread
+
+        return (
+          <div
+            key={p.id}
+            className="absolute select-none"
+            style={{
+              left:      `${p.x}%`,
+              top:       `${top}%`,
+              fontSize:  `${p.size * 0.55 + 5}px`,
+              color,
+              animation: [
+                `glitterPop ${p.swayDuration + 1.5}s ${p.swayDelay}s ease-in-out infinite`,
+                `glitterDrift ${p.duration * 0.7}s ${p.swayDelay * 0.5}s ease-in-out infinite`,
+              ].join(", "),
+            }}
+          >
+            {sym}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function ParticleField({ theme }: ParticleFieldProps) {
-  if (theme === "blush") return <FloatingHearts />;
-  if (theme === "golden") return <FloatingPetals />;
-  if (theme === "velvet") return <FloatingStars />;
+  if (theme === "blush")     return <FloatingHearts />;
+  if (theme === "golden")    return <FloatingPetals />;
+  if (theme === "velvet")    return <FloatingStars />;
+  if (theme === "scrapbook") return <ScrapbookGlitter />;
   return null;
 }
