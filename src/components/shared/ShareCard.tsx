@@ -408,6 +408,8 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
       { val: String(totalMoments),  label: "memories"       },
     ];
 
+    const D = pal.isDark;
+
     return (
       <div
         ref={ref}
@@ -415,10 +417,10 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
         style={{
           aspectRatio: "9 / 5",
           borderRadius: "20px",
-          background: pal.isDark
+          background: D
             ? `linear-gradient(135deg, ${pal.bgA} 0%, ${pal.bgB} 50%, ${pal.bgC} 100%)`
             : "var(--hero-gradient)",
-          boxShadow: pal.isDark
+          boxShadow: D
             ? `0 0 0 1px ${pal.panelBorder}, 0 8px 40px rgba(0,0,0,0.6)`
             : "var(--shadow-card), 0 0 0 1px var(--border-subtle)",
         }}
@@ -426,12 +428,16 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
         {/* accent glow blobs */}
         <div className="absolute rounded-full pointer-events-none" style={{
           width: "45%", height: "80%", top: "-20%", left: "-10%",
-          background: `radial-gradient(circle, ${pal.accent}44 0%, transparent 70%)`,
+          background: D
+            ? `radial-gradient(circle, ${pal.accent}44 0%, transparent 70%)`
+            : "radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)",
           filter: "blur(40px)",
         }} />
         <div className="absolute rounded-full pointer-events-none" style={{
           width: "30%", height: "55%", bottom: "-15%", right: "28%",
-          background: `radial-gradient(circle, ${pal.accent}28 0%, transparent 70%)`,
+          background: D
+            ? `radial-gradient(circle, ${pal.accent}28 0%, transparent 70%)`
+            : "radial-gradient(circle, var(--secondary-glow) 0%, transparent 70%)",
           filter: "blur(32px)",
         }} />
 
@@ -441,9 +447,9 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
           style={{
             width: "63%", padding: "7%",
             background: pal.panelBg,
-            borderRight: `1px solid ${pal.panelBorder}`,
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
+            borderRight: D ? `1px solid ${pal.panelBorder}` : "1px solid var(--border-subtle)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
           }}
         >
           {/* label */}
@@ -451,7 +457,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             fontSize: "clamp(7px, 1.1vw, 10px)",
             fontWeight: 500,
             letterSpacing: "0.3em",
-            color: pal.accent,
+            color: D ? pal.accent : "var(--accent-1)",
             opacity: 0.9,
             fontFamily: "var(--font-ui)",
           }}>
@@ -464,24 +470,26 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
               fontFamily: "var(--font-display)",
               fontWeight: 300,
               fontSize: "clamp(16px, 3.6vw, 40px)",
-              color: pal.text,
+              color: D ? pal.text : "var(--text-primary)",
               lineHeight: 1.1,
               marginBottom: "clamp(6px, 1vw, 12px)",
             }}>
               {couple.partner1Name}
-              <span style={{ color: pal.muted }}> & </span>
+              <span style={{ color: D ? pal.muted : "var(--text-muted)" }}> & </span>
               {couple.partner2Name}
             </div>
             <div style={{
               width: "clamp(36px, 7%, 64px)", height: "2px",
-              background: `linear-gradient(to right, ${pal.accent}, transparent)`,
+              background: D
+                ? `linear-gradient(to right, ${pal.accent}, transparent)`
+                : "var(--timeline-line)",
               marginBottom: "clamp(6px, 1.2vw, 12px)",
             }} />
             <div style={{
               fontFamily: "var(--font-display)",
               fontStyle: "italic",
               fontSize: "clamp(9px, 1.4vw, 13px)",
-              color: pal.muted,
+              color: D ? pal.muted : "var(--text-secondary)",
             }}>
               Since {formatDate(couple.startDate)}
             </div>
@@ -489,8 +497,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
               <div style={{
                 fontFamily: "var(--font-ui)",
                 fontSize: "clamp(8px, 1.1vw, 11px)",
-                color: pal.muted,
-                opacity: 0.8,
+                color: D ? pal.muted : "var(--text-muted)",
                 marginTop: "clamp(4px, 0.8vw, 8px)",
                 overflow: "hidden",
                 display: "-webkit-box",
@@ -505,7 +512,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
 
           {/* stats */}
           <div>
-            <div style={{ height: "1px", background: pal.panelBorder, marginBottom: "clamp(6px, 1.2vw, 12px)" }} />
+            <div style={{ height: "1px", background: D ? pal.panelBorder : "var(--border-subtle)", marginBottom: "clamp(6px, 1.2vw, 12px)" }} />
             <div className="flex items-end gap-[5%]">
               {stats.map((s) => (
                 <div key={s.label}>
@@ -513,7 +520,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
                     fontFamily: "var(--font-ui)",
                     fontWeight: 600,
                     fontSize: "clamp(11px, 1.9vw, 18px)",
-                    color: pal.accent,
+                    color: D ? pal.accent : "var(--accent-1)",
                     lineHeight: 1,
                   }}>
                     {s.val}
@@ -521,7 +528,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
                   <div style={{
                     fontFamily: "var(--font-ui)",
                     fontSize: "clamp(6px, 0.9vw, 9px)",
-                    color: pal.muted,
+                    color: D ? pal.muted : "var(--text-muted)",
                     marginTop: "2px",
                   }}>
                     {s.label}
@@ -537,10 +544,10 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
           className="absolute inset-y-0 right-0 flex flex-col items-center justify-center"
           style={{
             width: "35%",
-            background: pal.isDark ? `${pal.accent}28` : "rgba(255,255,255,0.38)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            borderLeft: `1px solid ${pal.panelBorder}`,
+            background: D ? `${pal.accent}28` : "rgba(255,255,255,0.38)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            borderLeft: D ? `1px solid ${pal.panelBorder}` : "1px solid var(--border-subtle)",
             gap: "clamp(6px, 1.5vw, 14px)",
             padding: "5%",
           }}
@@ -550,7 +557,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             fontSize: "clamp(6px, 0.95vw, 9px)",
             fontWeight: 500,
             letterSpacing: "0.18em",
-            color: pal.muted,
+            color: D ? pal.muted : "var(--text-muted)",
             textAlign: "center",
             lineHeight: 1.7,
           }}>
@@ -564,7 +571,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             padding: "clamp(4px, 0.8vw, 7px)",
             width: "clamp(52px, 11vw, 100px)",
             height: "clamp(52px, 11vw, 100px)",
-            boxShadow: `0 2px 12px ${pal.accent}44`,
+            boxShadow: D ? `0 2px 12px ${pal.accent}44` : "0 2px 12px var(--accent-glow)",
           }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -574,12 +581,12 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             />
           </div>
 
-          <div style={{ fontSize: "clamp(12px, 1.8vw, 18px)", color: pal.accent }}>♥</div>
+          <div style={{ fontSize: "clamp(12px, 1.8vw, 18px)", color: D ? pal.accent : "var(--accent-1)" }}>♥</div>
 
           <div style={{
             fontFamily: "var(--font-ui)",
             fontSize: "clamp(6px, 0.9vw, 9px)",
-            color: pal.muted,
+            color: D ? pal.muted : "var(--text-muted)",
             letterSpacing: "0.1em",
           }}>
             luminary.love
