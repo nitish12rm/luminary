@@ -79,49 +79,48 @@ export default function TimelineNode({
     <>
       <article ref={ref} className="relative">
 
-        {/* ── Ghost chapter number (decorative) ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 1.6, delay: 0.05, ease: "easeOut" }}
-          className="absolute -top-3 right-0 select-none pointer-events-none overflow-hidden leading-none"
-          aria-hidden
-        >
-          <span
-            className="font-display font-light"
-            style={{
-              fontSize: "clamp(4.5rem, 22vw, 8rem)",
-              color: "var(--accent-1)",
-              opacity: 0.055,
-              letterSpacing: "-0.05em",
-              display: "block",
-            }}
-          >
-            {String(index + 1).padStart(2, "0")}
-          </span>
-        </motion.div>
-
         {/* ── Content ── */}
-        <div className="relative z-10">
+        <div className="relative">
 
-          {/* Row: category label + date */}
+          {/* Row: index number + category label + date */}
           <div className="flex items-center justify-between gap-3 mb-5">
-            <Reveal inView={inView} delay={0}>
-              <div className="flex items-center gap-2">
-                <span style={{ fontSize: "1rem", lineHeight: 1 }}>{cat.emoji}</span>
-                <span
-                  className="font-semibold uppercase"
-                  style={{
-                    fontSize: "9.5px",
-                    letterSpacing: "0.22em",
-                    color: "var(--accent-1)",
-                  }}
-                >
-                  {label}
-                </span>
-              </div>
-            </Reveal>
-
+          <Reveal inView={inView} delay={0}>
+            <div className="flex items-center gap-3">
+              {/* Chapter number */}
+              <span
+                className="font-display font-light select-none"
+                style={{
+                  fontSize: "clamp(1.1rem, 3vw, 1.35rem)",
+                  color: "var(--accent-1)",
+                  opacity: 0.55,
+                  letterSpacing: "0.04em",
+                  lineHeight: 1,
+                }}
+              >
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span
+                style={{
+                  width: "1px",
+                  height: "14px",
+                  background: "var(--border-strong)",
+                  display: "inline-block",
+                  opacity: 0.5,
+                }}
+              />
+              <span style={{ fontSize: "1rem", lineHeight: 1 }}>{cat.emoji}</span>
+              <span
+                className="font-semibold uppercase"
+                style={{
+                  fontSize: "9.5px",
+                  letterSpacing: "0.22em",
+                  color: "var(--accent-1)",
+                }}
+              >
+                {label}
+              </span>
+            </div>
+          </Reveal>
             <Reveal inView={inView} delay={0.06}>
               <span
                 style={{

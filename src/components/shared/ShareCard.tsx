@@ -30,9 +30,9 @@ const CARD_THEMES: Record<string, ThemePal> = {
     isDark: false,
   },
   velvet: {
-    bgA: "#0f0a1a", bgB: "#1a0a38", bgC: "#0a1428",
-    accent: "#9b5fe0", text: "#f0e8ff", muted: "#c8b8e8",
-    panelBg: "rgba(255,255,255,0.07)", panelBorder: "rgba(155,95,224,0.4)",
+    bgA: "#0a0614", bgB: "#120830", bgC: "#060e20",
+    accent: "#9b5fe0", text: "#f0e8ff", muted: "#c0aee8",
+    panelBg: "rgba(14, 8, 36, 0.97)", panelBorder: "rgba(155,95,224,0.5)",
     isDark: true,
   },
 };
@@ -415,19 +415,23 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
         style={{
           aspectRatio: "9 / 5",
           borderRadius: "20px",
-          background: "var(--hero-gradient)",
-          boxShadow: "var(--shadow-card), 0 0 0 1px var(--border-subtle)",
+          background: pal.isDark
+            ? `linear-gradient(135deg, ${pal.bgA} 0%, ${pal.bgB} 50%, ${pal.bgC} 100%)`
+            : "var(--hero-gradient)",
+          boxShadow: pal.isDark
+            ? `0 0 0 1px ${pal.panelBorder}, 0 8px 40px rgba(0,0,0,0.6)`
+            : "var(--shadow-card), 0 0 0 1px var(--border-subtle)",
         }}
       >
         {/* accent glow blobs */}
         <div className="absolute rounded-full pointer-events-none" style={{
           width: "45%", height: "80%", top: "-20%", left: "-10%",
-          background: "radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)",
+          background: `radial-gradient(circle, ${pal.accent}44 0%, transparent 70%)`,
           filter: "blur(40px)",
         }} />
         <div className="absolute rounded-full pointer-events-none" style={{
           width: "30%", height: "55%", bottom: "-15%", right: "28%",
-          background: "radial-gradient(circle, var(--secondary-glow) 0%, transparent 70%)",
+          background: `radial-gradient(circle, ${pal.accent}28 0%, transparent 70%)`,
           filter: "blur(32px)",
         }} />
 
@@ -437,9 +441,9 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
           style={{
             width: "63%", padding: "7%",
             background: pal.panelBg,
-            borderRight: "1px solid var(--border-subtle)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
+            borderRight: `1px solid ${pal.panelBorder}`,
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
           }}
         >
           {/* label */}
@@ -447,7 +451,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             fontSize: "clamp(7px, 1.1vw, 10px)",
             fontWeight: 500,
             letterSpacing: "0.3em",
-            color: "var(--accent-1)",
+            color: pal.accent,
             opacity: 0.9,
             fontFamily: "var(--font-ui)",
           }}>
@@ -460,24 +464,24 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
               fontFamily: "var(--font-display)",
               fontWeight: 300,
               fontSize: "clamp(16px, 3.6vw, 40px)",
-              color: "var(--text-primary)",
+              color: pal.text,
               lineHeight: 1.1,
               marginBottom: "clamp(6px, 1vw, 12px)",
             }}>
               {couple.partner1Name}
-              <span style={{ color: "var(--text-muted)" }}> & </span>
+              <span style={{ color: pal.muted }}> & </span>
               {couple.partner2Name}
             </div>
             <div style={{
               width: "clamp(36px, 7%, 64px)", height: "2px",
-              background: "var(--timeline-line)",
+              background: `linear-gradient(to right, ${pal.accent}, transparent)`,
               marginBottom: "clamp(6px, 1.2vw, 12px)",
             }} />
             <div style={{
               fontFamily: "var(--font-display)",
               fontStyle: "italic",
               fontSize: "clamp(9px, 1.4vw, 13px)",
-              color: "var(--text-secondary)",
+              color: pal.muted,
             }}>
               Since {formatDate(couple.startDate)}
             </div>
@@ -485,7 +489,8 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
               <div style={{
                 fontFamily: "var(--font-ui)",
                 fontSize: "clamp(8px, 1.1vw, 11px)",
-                color: "var(--text-muted)",
+                color: pal.muted,
+                opacity: 0.8,
                 marginTop: "clamp(4px, 0.8vw, 8px)",
                 overflow: "hidden",
                 display: "-webkit-box",
@@ -500,7 +505,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
 
           {/* stats */}
           <div>
-            <div style={{ height: "1px", background: "var(--border-subtle)", marginBottom: "clamp(6px, 1.2vw, 12px)" }} />
+            <div style={{ height: "1px", background: pal.panelBorder, marginBottom: "clamp(6px, 1.2vw, 12px)" }} />
             <div className="flex items-end gap-[5%]">
               {stats.map((s) => (
                 <div key={s.label}>
@@ -508,7 +513,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
                     fontFamily: "var(--font-ui)",
                     fontWeight: 600,
                     fontSize: "clamp(11px, 1.9vw, 18px)",
-                    color: "var(--accent-1)",
+                    color: pal.accent,
                     lineHeight: 1,
                   }}>
                     {s.val}
@@ -516,7 +521,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
                   <div style={{
                     fontFamily: "var(--font-ui)",
                     fontSize: "clamp(6px, 0.9vw, 9px)",
-                    color: "var(--text-muted)",
+                    color: pal.muted,
                     marginTop: "2px",
                   }}>
                     {s.label}
@@ -532,10 +537,10 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
           className="absolute inset-y-0 right-0 flex flex-col items-center justify-center"
           style={{
             width: "35%",
-            background: pal.isDark ? "rgba(155,95,224,0.22)" : "rgba(255,255,255,0.38)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            borderLeft: "1px solid var(--border-subtle)",
+            background: pal.isDark ? `${pal.accent}28` : "rgba(255,255,255,0.38)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderLeft: `1px solid ${pal.panelBorder}`,
             gap: "clamp(6px, 1.5vw, 14px)",
             padding: "5%",
           }}
@@ -545,7 +550,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             fontSize: "clamp(6px, 0.95vw, 9px)",
             fontWeight: 500,
             letterSpacing: "0.18em",
-            color: "var(--text-muted)",
+            color: pal.muted,
             textAlign: "center",
             lineHeight: 1.7,
           }}>
@@ -559,7 +564,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             padding: "clamp(4px, 0.8vw, 7px)",
             width: "clamp(52px, 11vw, 100px)",
             height: "clamp(52px, 11vw, 100px)",
-            boxShadow: "0 2px 12px var(--accent-glow)",
+            boxShadow: `0 2px 12px ${pal.accent}44`,
           }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -569,12 +574,12 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             />
           </div>
 
-          <div style={{ fontSize: "clamp(12px, 1.8vw, 18px)", color: "var(--accent-1)" }}>♥</div>
+          <div style={{ fontSize: "clamp(12px, 1.8vw, 18px)", color: pal.accent }}>♥</div>
 
           <div style={{
             fontFamily: "var(--font-ui)",
             fontSize: "clamp(6px, 0.9vw, 9px)",
-            color: "var(--text-muted)",
+            color: pal.muted,
             letterSpacing: "0.1em",
           }}>
             luminary.love
