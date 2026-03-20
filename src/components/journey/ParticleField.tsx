@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ThemeId } from "@/types";
 
 interface ParticleFieldProps {
+  /** Initial theme from server; component listens for live data-theme changes */
   theme: ThemeId;
 }
 
@@ -178,9 +179,28 @@ function ScrapbookGlitter() {
 }
 
 export default function ParticleField({ theme }: ParticleFieldProps) {
-  if (theme === "blush")     return <FloatingHearts />;
-  if (theme === "golden")    return <FloatingPetals />;
-  if (theme === "velvet")    return <FloatingStars />;
-  if (theme === "scrapbook") return <ScrapbookGlitter />;
+  // Keep in sync with live data-theme attribute so switching themes updates particles
+  const [active, setActive] = useState<ThemeId>(theme);
+
+  useEffect(() => {
+    // Read immediately in case ThemeProvider / ThemeSwitcher already changed it
+    const cur = document.documentElement.getAttribute("data-theme") as ThemeId | null;
+    if (cur) setActive(cur);
+
+    const observer = new MutationObserver(() => {
+      const next = document.documentElement.getAttribute("data-theme") as ThemeId | null;
+      if (next) setActive(next);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  if (active === "blush")     return <FloatingHearts />;
+  if (active === "golden")    return <FloatingPetals />;
+  if (active === "velvet")    return <FloatingStars />;
+  if (active === "scrapbook") return <ScrapbookGlitter />;
   return null;
 }

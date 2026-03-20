@@ -5,6 +5,7 @@ import Couple from "@/models/Couple";
 import Moment from "@/models/Moment";
 import { ICouple, IMoment } from "@/types";
 import ThemeProvider from "@/components/shared/ThemeProvider";
+import ThemeSwitcher from "@/components/shared/ThemeSwitcher";
 import JourneyHero from "@/components/journey/JourneyHero";
 import Timeline from "@/components/journey/Timeline";
 import ParticleField from "@/components/journey/ParticleField";
@@ -52,7 +53,7 @@ export default async function JourneyPage({ params }: Props) {
   const { couple, moments } = data;
 
   return (
-    <ThemeProvider theme={couple.theme}>
+    <ThemeProvider theme={couple.theme} coupleId={couple._id}>
       <main
         className="min-h-screen relative"
         style={{ background: "var(--bg-primary)" }}
@@ -63,6 +64,8 @@ export default async function JourneyPage({ params }: Props) {
           <JourneyHero couple={couple} totalMoments={moments.length} />
           <Timeline moments={moments} couple={couple} />
         </div>
+
+        <ThemeSwitcher defaultTheme={couple.theme} coupleId={couple._id} />
       </main>
     </ThemeProvider>
   );
