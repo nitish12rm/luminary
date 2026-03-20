@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Toaster } from "react-hot-toast";
+import PWAInstallBanner from "@/components/shared/PWAInstallBanner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -45,6 +46,7 @@ export default function RootLayout({
       </head>
       <body>
         {children}
+        <PWAInstallBanner />
         <Toaster
           position="top-center"
           toastOptions={{
