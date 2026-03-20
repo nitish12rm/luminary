@@ -15,7 +15,7 @@ export async function GET(
 
     await connectDB();
 
-    const couple = await Couple.findOne({ accessCode: code }).lean();
+    const couple = await Couple.findOne({ accessCode: code }).lean() as { _id: unknown } & Record<string, unknown> | null;
     if (!couple) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
