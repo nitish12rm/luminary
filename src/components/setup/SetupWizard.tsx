@@ -95,7 +95,7 @@ export default function SetupWizard() {
 
       toast.success("Your love story is live! ✦");
       setTimeout(() => {
-        router.push(`/journey/${couple.accessCode}`);
+        router.push(`/setup/success?code=${couple.accessCode}`);
       }, 1000);
     } catch {
       toast.error("Something went wrong. Please try again.");
