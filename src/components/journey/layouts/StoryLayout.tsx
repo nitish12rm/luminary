@@ -92,7 +92,7 @@ function StepText({
 
         {/* Narrative */}
         <p
-          className={moment.poeticNarrative ? "font-display italic" : ""}
+          className={moment.poeticNarrative ? "font-display italic" : "font-display"}
           style={{
             fontSize: "clamp(1.05rem, 2.8vw, 1.2rem)",
             lineHeight: 1.9,
@@ -244,7 +244,7 @@ export default function StoryLayout({ moments, couple: _couple }: Props) {
               <div className="h-px mb-5" style={{ background: "var(--timeline-line)" }} />
 
               <p
-                className={moment.poeticNarrative ? "font-display italic" : ""}
+                className={moment.poeticNarrative ? "font-display italic" : "font-display"}
                 style={{ fontSize: "1.05rem", lineHeight: 1.9, color: "var(--text-primary)" }}
               >
                 {text}

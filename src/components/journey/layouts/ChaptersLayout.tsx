@@ -188,7 +188,7 @@ function ChapterMoment({ moment, index, isLast }: { moment: IMoment; index: numb
             initial={{ y: "105%", opacity: 0 }}
             animate={inView ? { y: "0%", opacity: 1 } : { y: "105%", opacity: 0 }}
             transition={{ duration: 0.85, ease: EXPO, delay: moment.photoPath ? 0.3 : 0.2 }}
-            className={moment.poeticNarrative ? "font-display italic" : ""}
+            className={moment.poeticNarrative ? "font-display italic" : "font-display"}
             style={{
               fontSize: "clamp(1rem, 3vw, 1.12rem)",
               lineHeight: 1.9,
