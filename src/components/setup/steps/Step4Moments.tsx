@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { CATEGORIES, getCategoryById } from "@/lib/categories";
-import { MomentDraft } from "@/types";
+import { MomentDraft, MomentCategory } from "@/types";
 import { CoupleForm } from "../SetupWizard";
 import MomentForm from "../MomentForm";
 import { v4 as uuidv4 } from "uuid";
@@ -27,6 +27,7 @@ export default function Step4Moments({
   submitting,
 }: Props) {
   const [showForm, setShowForm] = useState(false);
+  const [pendingCategory, setPendingCategory] = useState<MomentCategory>("first_meeting");
   const [editingId, setEditingId] = useState<string | null>(null);
 
   function addMoment(draft: Omit<MomentDraft, "id" | "order">) {
@@ -204,6 +205,7 @@ export default function Step4Moments({
           >
             <MomentForm
               couple={couple}
+              defaultCategory={pendingCategory}
               onSave={addMoment}
               onCancel={() => setShowForm(false)}
             />
@@ -228,7 +230,7 @@ export default function Step4Moments({
               return (
                 <button
                   key={cat.id}
-                  onClick={() => setShowForm(true)}
+                  onClick={() => { setPendingCategory(cat.id as MomentCategory); setShowForm(true); }}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all"
                   style={{
                     background: alreadyAdded ? "var(--accent-muted)" : "var(--bg-secondary)",
@@ -245,7 +247,7 @@ export default function Step4Moments({
           </div>
 
           <button
-            onClick={() => setShowForm(true)}
+            onClick={() => { setPendingCategory("custom"); setShowForm(true); }}
             className="w-full mt-3 py-3 rounded-xl text-sm font-medium transition-all"
             style={{
               border: `2px dashed var(--border-strong)`,

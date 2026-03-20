@@ -21,7 +21,7 @@ export default function ThemeProvider({ theme, coupleId, children }: ThemeProvid
       ? (localStorage.getItem(themeStorageKey(coupleId)) as ThemeId | null)
       : null;
 
-    const VALID: ThemeId[] = ["blush", "golden", "velvet", "scrapbook"];
+    const VALID: ThemeId[] = ["blush", "golden", "velvet"];
     const active = stored && VALID.includes(stored) ? stored : theme;
 
     document.documentElement.setAttribute("data-theme", active);

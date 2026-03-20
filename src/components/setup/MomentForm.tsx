@@ -11,12 +11,13 @@ import { formatDate } from "@/lib/utils";
 interface Props {
   couple: CoupleForm;
   initial?: MomentDraft;
+  defaultCategory?: MomentCategory;
   onSave: (draft: Omit<MomentDraft, "id" | "order">) => void;
   onCancel: () => void;
 }
 
-export default function MomentForm({ couple, initial, onSave, onCancel }: Props) {
-  const [category, setCategory] = useState<MomentCategory>(initial?.category || "first_meeting");
+export default function MomentForm({ couple, initial, defaultCategory, onSave, onCancel }: Props) {
+  const [category, setCategory] = useState<MomentCategory>(initial?.category || defaultCategory || "first_meeting");
   const [customLabel, setCustomLabel] = useState(initial?.customLabel || "");
   const [date, setDate] = useState(initial?.date || "");
   const [rawDescription, setRawDescription] = useState(initial?.rawDescription || "");

@@ -15,10 +15,9 @@ interface Props {
 }
 
 const THEME_EMOJIS: Record<ThemeId, string> = {
-  blush:     "🌸",
-  golden:    "✨",
-  velvet:    "🌙",
-  scrapbook: "✂️",
+  blush:  "🌸",
+  golden: "✨",
+  velvet: "🌙",
 };
 
 const EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -32,7 +31,7 @@ export default function ThemeSwitcher({ defaultTheme, coupleId, couple, totalMom
   // Sync with whatever ThemeProvider restored from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(themeStorageKey(coupleId)) as ThemeId | null;
-    const VALID: ThemeId[] = ["blush", "golden", "velvet", "scrapbook"];
+    const VALID: ThemeId[] = ["blush", "golden", "velvet"];
     if (stored && VALID.includes(stored)) setActive(stored);
   }, [coupleId]);
 

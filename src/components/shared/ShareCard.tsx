@@ -32,14 +32,8 @@ const CARD_THEMES: Record<string, ThemePal> = {
   velvet: {
     bgA: "#0f0a1a", bgB: "#1a0a38", bgC: "#0a1428",
     accent: "#9b5fe0", text: "#f0e8ff", muted: "#a08ac0",
-    panelBg: "rgba(26,16,48,0.75)", panelBorder: "rgba(155,95,224,0.28)",
+    panelBg: "rgba(26,16,48,0.88)", panelBorder: "rgba(155,95,224,0.35)",
     isDark: true,
-  },
-  scrapbook: {
-    bgA: "#fef8e8", bgB: "#fff0f8", bgC: "#f4f0ff",
-    accent: "#ff4da6", text: "#1a1228", muted: "#7a5868",
-    panelBg: "rgba(255,255,255,0.85)", panelBorder: "rgba(255,77,166,0.22)",
-    isDark: false,
   },
 };
 
@@ -425,9 +419,10 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
           className="absolute inset-y-0 left-0 flex flex-col justify-between"
           style={{
             width: "63%", padding: "7%",
-            background: pal.isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.45)",
+            background: pal.panelBg,
             borderRight: "1px solid var(--border-subtle)",
-            backdropFilter: "blur(12px)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
           }}
         >
           {/* label */}
@@ -520,8 +515,9 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
           className="absolute inset-y-0 right-0 flex flex-col items-center justify-center"
           style={{
             width: "35%",
-            background: pal.isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.38)",
-            backdropFilter: "blur(12px)",
+            background: pal.isDark ? "rgba(155,95,224,0.12)" : "rgba(255,255,255,0.38)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
             borderLeft: "1px solid var(--border-subtle)",
             gap: "clamp(6px, 1.5vw, 14px)",
             padding: "5%",
