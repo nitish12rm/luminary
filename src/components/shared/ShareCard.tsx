@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect, forwardRef } from "react";
+import { toPng } from "html-to-image";
 import { motion } from "framer-motion";
 import { ICouple } from "@/types";
 import { formatDate, getDays } from "@/lib/utils";
@@ -48,23 +49,6 @@ interface Props {
   activeTheme?: string;
 }
 
-/* ─── helper: draw rounded rect path ─── */
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number, y: number, w: number, h: number, r: number
-) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
 
 /* ══════════════════════════════════════════════
    ShareCard — preview + download
@@ -88,183 +72,23 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
       ? `${window.location.origin}/journey/${couple.accessCode}`
       : `/journey/${couple.accessCode}`;
 
-  /* ── Canvas-based PNG download — mirrors CardPreview exactly ── */
+  /* ── Download: snapshot the actual CardPreview DOM element ── */
   const handleDownload = useCallback(async () => {
+    if (!cardRef.current) return;
     setDownloading(true);
     try {
-      const W = 900, H = 500;
-      const canvas = document.createElement("canvas");
-      canvas.width = W * 2;
-      canvas.height = H * 2;
-      const ctx = canvas.getContext("2d")!;
-      ctx.scale(2, 2);
-
-      // ── background gradient (matches CardPreview) ──
-      const bg = ctx.createLinearGradient(0, 0, W, H);
-      bg.addColorStop(0,   pal.bgA);
-      bg.addColorStop(0.5, pal.bgB);
-      bg.addColorStop(1,   pal.bgC);
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, W, H);
-
-      // ── accent glow blobs ──
-      const drawBlob = (x: number, y: number, r: number, color: string, alpha: number) => {
-        const a = Math.round(alpha * 255).toString(16).padStart(2, "0");
-        const radial = ctx.createRadialGradient(x, y, 0, x, y, r);
-        radial.addColorStop(0, `${color}${a}`);
-        radial.addColorStop(1, `${color}00`);
-        ctx.save(); ctx.fillStyle = radial;
-        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-      };
-      drawBlob(-90, 140, 300, pal.accent, 0.25);
-      drawBlob(W * 0.72, H * 0.85, 200, pal.accent, 0.15);
-
-      // ── left panel (63% width, uses pal.panelBg) ──
-      const pw = Math.round(W * 0.63);
-      const px = 0, py = 0, ph = H;
-      ctx.save();
-      ctx.fillStyle = pal.panelBg;
-      roundRect(ctx, px, py, pw, ph, 0);
-      ctx.fill();
-      ctx.restore();
-      // right border
-      ctx.save();
-      ctx.strokeStyle = pal.panelBorder;
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(pw, 0); ctx.lineTo(pw, H); ctx.stroke();
-      ctx.restore();
-
-      const pad = Math.round(W * 0.07); // 7% padding like CSS
-
-      // luminary label
-      ctx.save();
-      ctx.fillStyle = pal.accent;
-      ctx.globalAlpha = 0.9;
-      ctx.font = "500 11px Arial, sans-serif";
-      ctx.fillText("L U M I N A R Y  \u2665", pad, pad + 18);
-      ctx.restore();
-
-      // couple names
-      const totalChars = couple.partner1Name.length + couple.partner2Name.length;
-      const nameSize = totalChars > 22 ? 32 : totalChars > 16 ? 38 : 44;
-      ctx.fillStyle = pal.text;
-      ctx.font = `300 ${nameSize}px Georgia, serif`;
-      const nameY = Math.round(H * 0.46);
-      ctx.fillText(couple.partner1Name, pad, nameY, pw - pad * 2);
-      ctx.fillStyle = pal.muted;
-      ctx.fillText("  &  ", pad + ctx.measureText(couple.partner1Name).width, nameY);
-      ctx.fillStyle = pal.text;
-      const andW = ctx.measureText("  &  ").width;
-      ctx.fillText(couple.partner2Name, pad + ctx.measureText(couple.partner1Name).width + andW, nameY, pw - pad * 2);
-
-      // accent underline
-      const lineGrad = ctx.createLinearGradient(pad, 0, pad + 80, 0);
-      lineGrad.addColorStop(0, pal.accent);
-      lineGrad.addColorStop(1, `${pal.accent}00`);
-      ctx.fillStyle = lineGrad;
-      ctx.fillRect(pad, nameY + 10, 80, 2);
-
-      // since date
-      ctx.fillStyle = pal.muted;
-      ctx.font = "italic 14px Georgia, serif";
-      ctx.fillText(`Since ${formatDate(couple.startDate)}`, pad, nameY + 34);
-
-      // bio
-      if (couple.bio) {
-        ctx.fillStyle = pal.muted;
-        ctx.globalAlpha = 0.8;
-        ctx.font = "13px Arial, sans-serif";
-        const maxBioW = pw - pad * 2;
-        let bioLine = "";
-        for (const word of couple.bio.split(" ")) {
-          const test = bioLine ? bioLine + " " + word : word;
-          if (ctx.measureText(test).width > maxBioW) break;
-          bioLine = test;
-        }
-        ctx.fillText(bioLine + (bioLine !== couple.bio ? "\u2026" : ""), pad, nameY + 56);
-        ctx.globalAlpha = 1;
-      }
-
-      // stats divider
-      const statsY = Math.round(H * 0.82);
-      ctx.strokeStyle = pal.panelBorder;
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(pad, statsY - 14); ctx.lineTo(pw - pad, statsY - 14); ctx.stroke();
-
-      // stats
-      const stats = [
-        { val: days.toLocaleString(), label: "days together" },
-        { val: duration,              label: "of love"        },
-        { val: String(totalMoments),  label: "memories"       },
-      ];
-      let sx = pad;
-      for (const s of stats) {
-        ctx.fillStyle = pal.accent;
-        ctx.font = "600 20px Arial, sans-serif";
-        ctx.fillText(s.val, sx, statsY);
-        ctx.fillStyle = pal.muted;
-        ctx.font = "11px Arial, sans-serif";
-        ctx.fillText(s.label, sx, statsY + 18);
-        sx += Math.round((pw - pad * 2) / 3);
-      }
-
-      // ── right QR panel (35% width, uses pal.qrPanelBg) ──
-      const qx = pw + 1, qy = 0, qw = W - pw - 1, qh = H;
-      ctx.save();
-      ctx.fillStyle = pal.qrPanelBg;
-      roundRect(ctx, qx, qy, qw, qh, 0);
-      ctx.fill();
-      ctx.restore();
-
-      const qCx = qx + qw / 2; // centre x of QR panel
-
-      ctx.fillStyle = pal.muted;
-      ctx.font = "500 10px Arial, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("SCAN TO VISIT", qCx, Math.round(H * 0.22));
-      ctx.fillText("OUR JOURNEY",   qCx, Math.round(H * 0.22) + 16);
-
-      // QR image
-      const qrSize = Math.round(qw * 0.58);
-      const qrX = qx + (qw - qrSize) / 2;
-      const qrY = Math.round(H * 0.32);
-
-      await new Promise<void>((resolve) => {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => {
-          ctx.save();
-          ctx.fillStyle = "#ffffff";
-          roundRect(ctx, qrX - 7, qrY - 7, qrSize + 14, qrSize + 14, 10);
-          ctx.fill();
-          ctx.restore();
-          ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
-          resolve();
-        };
-        img.onerror = () => resolve();
-        img.src = `/api/qr?url=${encodeURIComponent(journeyUrl)}`;
+      const dataUrl = await toPng(cardRef.current, {
+        pixelRatio: 3,
+        cacheBust: true,
       });
-
-      ctx.fillStyle = pal.accent;
-      ctx.font = "20px serif";
-      ctx.fillText("\u2665", qCx, qrY + qrSize + 32);
-
-      ctx.fillStyle = pal.muted;
-      ctx.globalAlpha = 0.7;
-      ctx.font = "10px Arial, sans-serif";
-      ctx.fillText("luminary.love", qCx, qrY + qrSize + 52);
-      ctx.globalAlpha = 1;
-      ctx.textAlign = "left";
-
       const link = document.createElement("a");
       link.download = `${couple.partner1Name}-${couple.partner2Name}-luminary.png`;
-      link.href = canvas.toDataURL("image/png");
+      link.href = dataUrl;
       link.click();
     } finally {
       setDownloading(false);
     }
-  }, [couple, totalMoments, journeyUrl, pal, days, duration]);
+  }, [couple, cardRef]);
 
   return (
     <>
