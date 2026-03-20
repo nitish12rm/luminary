@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { IMoment, ICouple } from "@/types";
 import { getCategoryById } from "@/lib/categories";
@@ -93,6 +93,7 @@ function ChapterTitle({ year, chapterIndex }: { year: string; chapterIndex: numb
 function ChapterMoment({ moment, index, isLast }: { moment: IMoment; index: number; isLast: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
+  const [photoOpen, setPhotoOpen] = useState(false);
 
   const cat = getCategoryById(moment.category);
   const label =
@@ -102,6 +103,7 @@ function ChapterMoment({ moment, index, isLast }: { moment: IMoment; index: numb
   const text = moment.poeticNarrative || moment.rawDescription;
 
   return (
+    <>
     <div ref={ref} className="relative pl-8 md:pl-10">
       {/* Vertical connector line */}
       {!isLast && (
@@ -160,14 +162,23 @@ function ChapterMoment({ moment, index, isLast }: { moment: IMoment; index: numb
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
             animate={inView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.97 }}
             transition={{ duration: 0.8, ease: EXPO, delay: 0.2 }}
-            className="relative overflow-hidden rounded-2xl mb-5"
+            className="relative overflow-hidden rounded-2xl mb-5 cursor-pointer group"
             style={{ height: "clamp(180px, 48vw, 280px)" }}
+            onClick={() => setPhotoOpen(true)}
           >
-            <img
+            <motion.img
               src={moment.photoPath}
               alt={moment.photoAlt || label}
               className="w-full h-full object-cover"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
             />
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
+              style={{ background: "rgba(0,0,0,0.15)" }}
+            >
+              <span className="text-white text-2xl opacity-80">⤢</span>
+            </div>
           </motion.div>
         )}
 
@@ -189,6 +200,37 @@ function ChapterMoment({ moment, index, isLast }: { moment: IMoment; index: numb
         </div>
       </div>
     </div>
+
+      {/* Lightbox */}
+      {photoOpen && moment.photoPath && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.93)" }}
+          onClick={() => setPhotoOpen(false)}
+        >
+          <motion.img
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.45, ease: EXPO }}
+            src={moment.photoPath}
+            alt={moment.photoAlt || label}
+            className="max-w-full rounded-2xl object-contain"
+            style={{ maxHeight: "88vh" }}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            className="absolute top-5 right-5 w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors"
+            style={{ background: "rgba(255,255,255,0.1)" }}
+            onClick={() => setPhotoOpen(false)}
+          >
+            ✕
+          </button>
+        </motion.div>
+      )}
+    </>
   );
 }
 
