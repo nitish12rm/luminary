@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
+import { put } from "@vercel/blob";
+import sharp from "sharp";
 
-const MAX_SIZE_MB = 5;
+const MAX_SIZE_MB = 15;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export async function POST(req: NextRequest) {
@@ -28,24 +27,37 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Build the upload path
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const fileName = `${uuidv4()}.${ext}`;
-    const subDir = coupleId || "general";
-    const uploadDir = path.join(process.cwd(), "public", "uploads", subDir);
+    let compressed: Buffer;
+    let contentType: string;
 
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, fileName), buffer);
+    if (file.type === "image/gif") {
+      // GIFs: skip compression to preserve animation
+      compressed = buffer;
+      contentType = "image/gif";
+    } else {
+      // Convert to WebP with high quality + auto-orient from EXIF
+      compressed = await sharp(buffer)
+        .rotate()                                          // auto-correct EXIF orientation
+        .resize(2400, 2400, {
+          fit: "inside",
+          withoutEnlargement: true,                       // never upscale
+        })
+        .webp({ quality: 88, effort: 4, smartSubsample: true })
+        .toBuffer();
+      contentType = "image/webp";
+    }
 
-    const filePath = `/uploads/${subDir}/${fileName}`;
+    const ext = file.type === "image/gif" ? "gif" : "webp";
+    const fileName = `luminary/${coupleId || "general"}/${Date.now()}.${ext}`;
 
-    return NextResponse.json({ path: filePath });
+    const blob = await put(fileName, compressed, {
+      access: "public",
+      contentType,
+    });
+
+    return NextResponse.json({ path: blob.url });
   } catch (err) {
     console.error("[upload]", err);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
-
-export const config = {
-  api: { bodyParser: false },
-};

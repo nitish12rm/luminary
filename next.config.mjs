@@ -16,7 +16,9 @@ const nextConfig = {
     remotePatterns: [],
     unoptimized: true,
   },
-  serverExternalPackages: ["mongoose"],
+  experimental: {
+    serverComponentsExternalPackages: ["mongoose"],
+  },
 };
 
 export default withPWA(nextConfig);
