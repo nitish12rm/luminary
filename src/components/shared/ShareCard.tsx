@@ -30,9 +30,9 @@ const CARD_THEMES: Record<string, ThemePal> = {
     isDark: false,
   },
   velvet: {
-    bgA: "#0a0614", bgB: "#120830", bgC: "#060e20",
-    accent: "#9b5fe0", text: "#f0e8ff", muted: "#c0aee8",
-    panelBg: "rgba(14, 8, 36, 0.97)", panelBorder: "rgba(155,95,224,0.5)",
+    bgA: "#06060f", bgB: "#0a0818", bgC: "#04040c",
+    accent: "#9b5fe0", text: "#dcdce8", muted: "#a8a8c0",
+    panelBg: "rgba(4, 4, 14, 0.97)", panelBorder: "rgba(180,180,210,0.15)",
     isDark: true,
   },
 };
@@ -167,13 +167,13 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.fillRect(px + 32, py + 114, 80, 2);
 
       // since date
-      ctx.fillStyle = pal.isDark ? "rgba(220,200,255,0.85)" : `${pal.muted}cc`;
+      ctx.fillStyle = pal.isDark ? "rgba(210,210,230,0.9)" : `${pal.muted}cc`;
       ctx.font = "italic 16px Georgia, serif";
       ctx.fillText(`Since ${formatDate(couple.startDate)}`, px + 32, py + 152);
 
       // bio
       if (couple.bio) {
-        ctx.fillStyle = pal.isDark ? "rgba(200,180,240,0.75)" : `${pal.muted}88`;
+        ctx.fillStyle = pal.isDark ? "rgba(190,190,215,0.75)" : `${pal.muted}88`;
         ctx.font = "14px Arial, sans-serif";
         const maxW = pw - 80;
         let bioLine = "";
@@ -204,7 +204,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
         ctx.fillStyle = pal.accent;
         ctx.font = "600 22px Arial, sans-serif";
         ctx.fillText(s.val, sx, statsY);
-        ctx.fillStyle = pal.isDark ? "rgba(200,180,240,0.75)" : `${pal.muted}bb`;
+        ctx.fillStyle = pal.isDark ? "rgba(190,190,215,0.75)" : `${pal.muted}bb`;
         ctx.font = "12px Arial, sans-serif";
         ctx.fillText(s.label, sx, statsY + 20);
         sx += 120;
@@ -233,7 +233,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.stroke();
       ctx.restore();
 
-      ctx.fillStyle = pal.isDark ? "rgba(200,180,240,0.9)" : `${pal.muted}99`;
+      ctx.fillStyle = pal.isDark ? "rgba(210,210,230,0.9)" : `${pal.muted}99`;
       ctx.font = "11px Arial, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("SCAN TO VISIT", qx + qw / 2, qy + 32);
@@ -265,7 +265,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.textAlign = "center";
       ctx.fillText("\u2665", qx + qw / 2, qrY + qrSize + 40);
 
-      ctx.fillStyle = pal.isDark ? "rgba(200,180,240,0.65)" : `${pal.muted}66`;
+      ctx.fillStyle = pal.isDark ? "rgba(190,190,215,0.65)" : `${pal.muted}66`;
       ctx.font = "11px Arial, sans-serif";
       ctx.fillText("luminary.love", qx + qw / 2, qrY + qrSize + 60);
       ctx.textAlign = "left";
