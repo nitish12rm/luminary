@@ -36,7 +36,6 @@ const CoupleSchema = new Schema<ICoupleDocument>(
   { timestamps: true }
 );
 
-CoupleSchema.index({ accessCode: 1 });
 
 const Couple =
   mongoose.models.Couple ||
