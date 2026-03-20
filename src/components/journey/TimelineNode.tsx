@@ -165,7 +165,7 @@ export default function TimelineNode({
               className={
                 !showRaw && moment.poeticNarrative
                   ? "font-display italic"
-                  : ""
+                  : "font-display"
               }
               style={{
                 fontSize: "clamp(1.04rem, 3vw, 1.16rem)",
