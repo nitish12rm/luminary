@@ -546,6 +546,14 @@ body {
   100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
 }
 
+/* Full-viewport float — enters from bottom, exits at top */
+@keyframes loveFloat {
+  0%   { transform: translateY(0)       rotate(0deg);   opacity: 0;   }
+  8%   { opacity: 1; }
+  88%  { opacity: 0.85; }
+  100% { transform: translateY(-115vh)  rotate(720deg); opacity: 0;   }
+}
+
 @keyframes sway {
   0%, 100% { transform: translateX(0px); }
   50%       { transform: translateX(18px); }
