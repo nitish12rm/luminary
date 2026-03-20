@@ -7,10 +7,10 @@ import { formatDate, getDays } from "@/lib/utils";
 
 /* ─── theme palettes for canvas drawing ─── */
 const CARD_THEMES: Record<string, { bgA: string; bgB: string; bgC: string; accent: string; text: string }> = {
-  blush:     { bgA: "#0c0008", bgB: "#1e0018", bgC: "#0a0010", accent: "#e8789a", text: "#fce8f0" },
-  golden:    { bgA: "#090600", bgB: "#1c1500", bgC: "#0d0a00", accent: "#f0c040", text: "#fdf8e8" },
-  velvet:    { bgA: "#07050f", bgB: "#130a2c", bgC: "#060414", accent: "#a06eed", text: "#f0e8ff" },
-  scrapbook: { bgA: "#070010", bgB: "#1a0038", bgC: "#070010", accent: "#ff4da6", text: "#fce8f8" },
+  blush:     { bgA: "#1a0018", bgB: "#3d0030", bgC: "#160025", accent: "#e8789a", text: "#fff0f6" },
+  golden:    { bgA: "#1a1000", bgB: "#3d2800", bgC: "#160a00", accent: "#d4a017", text: "#fffaf0" },
+  velvet:    { bgA: "#0c071a", bgB: "#1a0a38", bgC: "#070614", accent: "#9b5fe0", text: "#f0e8ff" },
+  scrapbook: { bgA: "#1a1230", bgB: "#2e1a50", bgC: "#100a28", accent: "#ff4da6", text: "#fff0fa" },
 };
 
 /* ─── props ─── */
