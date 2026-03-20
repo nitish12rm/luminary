@@ -1,1 +1,181 @@
-GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [404 Not Found] models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+You are a senior full-stack engineer and startup builder.
+
+Build a complete production-ready web application that also works as a Progressive Web App (PWA). The application is a private, closed social platform designed exclusively for families.
+
+IMPORTANT CONSTRAINTS:
+- Use MongoDB as the database.
+- Authentication (login/logout/signup) must be implemented using MongoDB for now.
+- Do NOT assume any external auth providers.
+- Implement everything end-to-end (backend, frontend, database models, APIs, state management, UI).
+- Ensure the app is mobile-first and works smoothly on phones.
+- Follow clean architecture principles and separation of concerns.
+
+---
+
+## 🧭 PRODUCT IDEA
+
+A private family-only social platform where:
+- Each family is its own closed network.
+- Only invited members can join and interact.
+- It replaces WhatsApp-style family groups with a structured, meaningful experience.
+
+---
+
+## 🧱 MVP SCOPE (Build this first)
+
+### 1. Authentication
+- Signup (email + password)
+- Login / Logout
+- Store users in MongoDB
+- Maintain session handling
+- Basic validation and error handling
+
+---
+
+### 2. Family System
+- Create a family (with name)
+- Generate invite system:
+  - Link
+  - QR code (optional for MVP)
+- Join family via invite
+- One user can belong to multiple families
+- Switch between families
+
+---
+
+### 3. Member Profiles
+Each user inside a family has a **member profile**:
+
+Fields:
+- Full name
+- Date of birth
+- Phone
+- Email
+- Profile photo (optional)
+- Status (what they are doing / life update)
+- Education details
+- Goals / aspirations
+
+---
+
+### 4. Family Tree (Core Feature)
+- Visual or structured family tree
+- Each member can define:
+  - Father
+  - Mother
+  - Children
+- If a relative does NOT exist:
+  - Create a placeholder member
+- If a relative exists:
+  - Link to that member
+
+Also support:
+- Dead/inaccessible members (no login, still part of tree)
+- Placeholder members (no account yet)
+
+---
+
+### 5. Feed (Family-only Social Media)
+- Post updates (text + optional media)
+- Only visible inside that family
+- Show posts in chronological order
+- Each post has:
+  - Author
+  - Content
+  - Timestamp
+
+---
+
+### 6. Status System
+- Each member can update:
+  - Current activity
+  - Life updates
+- Visible to family members
+
+---
+
+### 7. Chat (Basic MVP)
+- Family group chat
+- Send messages
+- Show sender + timestamp
+
+---
+
+### 8. Documents Sharing
+- Members can upload documents
+- Documents visible to family (or controlled access)
+- Examples:
+  - Certificates
+  - Important files
+
+---
+
+### 9. Access Control
+- Only invited members can:
+  - View posts
+  - Access family tree
+  - Chat
+- No public visibility
+
+---
+
+### 10. Multi-Family Support
+- A user can:
+  - Be part of multiple families
+  - Switch between them
+
+---
+
+## ⚙️ NON-FUNCTIONAL REQUIREMENTS
+
+- Mobile-first responsive UI
+- Fast loading (optimize for low bandwidth)
+- Secure authentication (basic hashing for MVP)
+- Clean and modular architecture
+- Easy to extend later (for calls, AI features, etc.)
+
+---
+
+## 🧠 ADVANCED FEATURES (Design for later, don’t fully implement yet)
+
+- Video/audio calling
+- Smart relationship detection
+- AI-generated family insights
+- Notifications
+- Private chats (1:1)
+
+---
+
+## 📦 DELIVERABLES
+
+- Full project structure
+- Backend APIs
+- Database schema (MongoDB collections)
+- Frontend UI (mobile-first)
+- State management
+- Routing/navigation
+- PWA support (installable, offline-ready basics)
+- Clear instructions to run locally
+
+---
+
+## 🚀 EXECUTION STRATEGY
+
+1. Start with MVP only
+2. Build incrementally:
+   - Auth → Family → Profile → Feed → Chat → Tree
+3. Keep code clean and modular
+4. Use reusable components
+5. Avoid overengineering
+
+---
+
+## ⚠️ NOTE
+
+npm will not run on this current device. 
+Still generate the full working project and instructions so it can be run on another machine.
+
+---
+
+Build this like a real startup product, not a demo.
+Focus on clarity, scalability, and clean structure.
