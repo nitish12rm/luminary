@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 async function getData(code: string) {
   await connectDB();
-  const coupleDoc = await Couple.findOne({ accessCode: code }).lean();
+  const coupleDoc = await Couple.findOne({ accessCode: code }).lean() as { _id: unknown } & Record<string, unknown> | null;
   if (!coupleDoc) return null;
   const momentCount = await Moment.countDocuments({ coupleId: coupleDoc._id });
   return {

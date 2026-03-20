@@ -17,7 +17,7 @@ interface Props {
 async function getJourneyData(code: string) {
   await connectDB();
 
-  const coupleDoc = await Couple.findOne({ accessCode: code }).lean();
+  const coupleDoc = await Couple.findOne({ accessCode: code }).lean() as { _id: unknown } & Record<string, unknown> | null;
   if (!coupleDoc) return null;
 
   const momentDocs = await Moment.find({ coupleId: coupleDoc._id })
