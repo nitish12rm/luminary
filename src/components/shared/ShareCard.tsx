@@ -31,8 +31,8 @@ const CARD_THEMES: Record<string, ThemePal> = {
   },
   velvet: {
     bgA: "#0f0a1a", bgB: "#1a0a38", bgC: "#0a1428",
-    accent: "#9b5fe0", text: "#f0e8ff", muted: "#a08ac0",
-    panelBg: "rgba(26,16,48,0.88)", panelBorder: "rgba(155,95,224,0.35)",
+    accent: "#9b5fe0", text: "#f0e8ff", muted: "#c8b8e8",
+    panelBg: "rgba(255,255,255,0.07)", panelBorder: "rgba(155,95,224,0.4)",
     isDark: true,
   },
 };
@@ -122,11 +122,20 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       // left glass panel
       const px = 48, py = 48, pw = W - 316, ph = H - 96;
       ctx.save();
-      ctx.globalAlpha = pal.isDark ? 0.12 : 0.5;
-      ctx.fillStyle = pal.isDark ? "#ffffff" : "#ffffff";
+      ctx.globalAlpha = pal.isDark ? 0.07 : 0.5;
+      ctx.fillStyle = "#ffffff";
       roundRect(ctx, px, py, pw, ph, 20);
       ctx.fill();
       ctx.restore();
+      if (pal.isDark) {
+        // extra accent tint for velvet panel visibility
+        ctx.save();
+        ctx.globalAlpha = 0.06;
+        ctx.fillStyle = pal.accent;
+        roundRect(ctx, px, py, pw, ph, 20);
+        ctx.fill();
+        ctx.restore();
+      }
       ctx.save();
       ctx.strokeStyle = pal.panelBorder;
       ctx.lineWidth = 1.5;
@@ -158,13 +167,13 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.fillRect(px + 32, py + 114, 80, 2);
 
       // since date
-      ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.55)" : `${pal.muted}cc`;
+      ctx.fillStyle = pal.isDark ? "rgba(220,200,255,0.85)" : `${pal.muted}cc`;
       ctx.font = "italic 16px Georgia, serif";
       ctx.fillText(`Since ${formatDate(couple.startDate)}`, px + 32, py + 152);
 
       // bio
       if (couple.bio) {
-        ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.35)" : `${pal.muted}88`;
+        ctx.fillStyle = pal.isDark ? "rgba(200,180,240,0.75)" : `${pal.muted}88`;
         ctx.font = "14px Arial, sans-serif";
         const maxW = pw - 80;
         let bioLine = "";
@@ -195,7 +204,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
         ctx.fillStyle = pal.accent;
         ctx.font = "600 22px Arial, sans-serif";
         ctx.fillText(s.val, sx, statsY);
-        ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.4)" : `${pal.muted}bb`;
+        ctx.fillStyle = pal.isDark ? "rgba(200,180,240,0.75)" : `${pal.muted}bb`;
         ctx.font = "12px Arial, sans-serif";
         ctx.fillText(s.label, sx, statsY + 20);
         sx += 120;
@@ -204,11 +213,19 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       // QR panel
       const qx = W - 256, qy = 48, qw = 208, qh = H - 96;
       ctx.save();
-      ctx.globalAlpha = pal.isDark ? 0.1 : 0.45;
+      ctx.globalAlpha = pal.isDark ? 0.07 : 0.45;
       ctx.fillStyle = "#ffffff";
       roundRect(ctx, qx, qy, qw, qh, 20);
       ctx.fill();
       ctx.restore();
+      if (pal.isDark) {
+        ctx.save();
+        ctx.globalAlpha = 0.18;
+        ctx.fillStyle = pal.accent;
+        roundRect(ctx, qx, qy, qw, qh, 20);
+        ctx.fill();
+        ctx.restore();
+      }
       ctx.save();
       ctx.strokeStyle = pal.panelBorder;
       ctx.lineWidth = 1.5;
@@ -216,7 +233,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.stroke();
       ctx.restore();
 
-      ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.4)" : `${pal.muted}99`;
+      ctx.fillStyle = pal.isDark ? "rgba(200,180,240,0.9)" : `${pal.muted}99`;
       ctx.font = "11px Arial, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("SCAN TO VISIT", qx + qw / 2, qy + 32);
@@ -248,7 +265,7 @@ export default function ShareCard({ couple, totalMoments }: Props) {
       ctx.textAlign = "center";
       ctx.fillText("\u2665", qx + qw / 2, qrY + qrSize + 40);
 
-      ctx.fillStyle = pal.isDark ? "rgba(255,255,255,0.25)" : `${pal.muted}66`;
+      ctx.fillStyle = pal.isDark ? "rgba(200,180,240,0.65)" : `${pal.muted}66`;
       ctx.font = "11px Arial, sans-serif";
       ctx.fillText("luminary.love", qx + qw / 2, qrY + qrSize + 60);
       ctx.textAlign = "left";
@@ -515,7 +532,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
           className="absolute inset-y-0 right-0 flex flex-col items-center justify-center"
           style={{
             width: "35%",
-            background: pal.isDark ? "rgba(155,95,224,0.12)" : "rgba(255,255,255,0.38)",
+            background: pal.isDark ? "rgba(155,95,224,0.22)" : "rgba(255,255,255,0.38)",
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
             borderLeft: "1px solid var(--border-subtle)",
