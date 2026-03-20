@@ -39,27 +39,86 @@ function useParticles(count: number): Particle[] {
   return particles;
 }
 
-// ── Blush: floating hearts ──
+// ── Blush: layered love particles ──
 function FloatingHearts() {
-  const particles = useParticles(18);
+  // Layer 1 — hearts that rise from the bottom
+  const floaters  = useParticles(28);
+  // Layer 2 — sparkles + tiny hearts that twinkle at fixed positions
+  const twinklers = useParticles(14);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="absolute select-none"
-          style={{
-            left: `${p.x}%`,
-            bottom: "-20px",
-            fontSize: `${p.size}px`,
-            opacity: p.opacity,
-            animation: `floatUp ${p.duration}s ${p.delay}s ease-in-out infinite, sway ${p.swayDuration}s ${p.swayDelay}s ease-in-out infinite alternate`,
-          }}
-        >
-          {p.id % 3 === 0 ? "♥" : p.id % 3 === 1 ? "✦" : "·"}
-        </div>
-      ))}
+
+      {/* Rising hearts */}
+      {floaters.map((p) => {
+        // Every 4th particle is a large ghost heart (ambient background feel)
+        const isGhost  = p.id % 4 === 0;
+        // Every 4th+2 is medium
+        const isMedium = p.id % 4 === 1 || p.id % 4 === 2;
+
+        const SYMBOLS = ["♥", "❤", "♡", "❣", "✦", "♥", "♡", "✿"];
+        const symbol  = SYMBOLS[p.id % SYMBOLS.length];
+
+        const size    = isGhost  ? p.size + 14          // 22–34 px  big & soft
+                      : isMedium ? p.size               // 8–20 px   normal
+                      :            p.size * 0.45 + 4;   // 4–10 px   tiny
+
+        const opacity = isGhost  ? 0.055
+                      : isMedium ? p.opacity * 0.65
+                      :            p.opacity * 0.45;
+
+        const color   = p.id % 3 === 0 ? "var(--particle-a)"
+                      : p.id % 3 === 1 ? "var(--particle-b)"
+                      :                  "var(--particle-c)";
+
+        // Ghost hearts pulse with heartbeat; others sway side-to-side
+        const animation = isGhost
+          ? `floatUp ${p.duration + 10}s ${p.delay}s ease-in-out infinite, heartbeat ${p.swayDuration + 2}s ${p.swayDelay}s ease-in-out infinite`
+          : `floatUp ${p.duration}s ${p.delay}s ease-in-out infinite, sway ${p.swayDuration}s ${p.swayDelay}s ease-in-out infinite alternate`;
+
+        return (
+          <div
+            key={p.id}
+            className="absolute select-none"
+            style={{
+              left:      `${p.x}%`,
+              bottom:    "-24px",
+              fontSize:  `${size}px`,
+              opacity,
+              color,
+              animation,
+            }}
+          >
+            {symbol}
+          </div>
+        );
+      })}
+
+      {/* Twinkling sparkles & blossoms scattered at fixed positions */}
+      {twinklers.map((p) => {
+        const top    = ((p.id * 19 + 11) % 84) + 5; // deterministic spread
+        const SPARKLES = ["✦", "✧", "✿", "❀", "✦", "✩", "·", "✧"];
+        const symbol   = SPARKLES[p.id % SPARKLES.length];
+        const color    = p.id % 2 === 0 ? "var(--particle-a)" : "var(--particle-c)";
+
+        return (
+          <div
+            key={`tw${p.id}`}
+            className="absolute select-none"
+            style={{
+              left:      `${p.x}%`,
+              top:       `${top}%`,
+              fontSize:  `${p.size * 0.5 + 5}px`,
+              color,
+              opacity:   0,           // twinkle keyframe drives opacity
+              animation: `twinkle ${p.swayDuration + 2.5}s ${p.swayDelay}s ease-in-out infinite`,
+            }}
+          >
+            {symbol}
+          </div>
+        );
+      })}
+
     </div>
   );
 }
