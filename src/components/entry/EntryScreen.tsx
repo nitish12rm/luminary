@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -8,64 +8,25 @@ import Link from "next/link";
 import ParallaxBlob from "@/components/shared/ParallaxBlob";
 
 export default function EntryScreen() {
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [shake, setShake] = useState(false);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
 
-  const handleInput = (i: number, val: string) => {
-    const char = val.slice(-1).toLowerCase();
-    if (!/[a-z0-9]/.test(char) && char !== "") return;
-
-    const next = [...code];
-    next[i] = char;
-    setCode(next);
-
-    if (char && i < 5) {
-      inputRefs.current[i + 1]?.focus();
-    }
-
-    if (next.every((c) => c !== "") && next.join("").length === 6) {
-      submitCode(next.join(""));
-    }
-  };
-
-  const handleKeyDown = (i: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !code[i] && i > 0) {
-      inputRefs.current[i - 1]?.focus();
-    }
-    if (e.key === "Enter") {
-      const full = code.join("");
-      if (full.length === 6) submitCode(full);
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData("text").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 6);
-    if (!pasted) return;
-    const next = [...code];
-    for (let i = 0; i < 6; i++) next[i] = pasted[i] || "";
-    setCode(next);
-    inputRefs.current[Math.min(pasted.length, 5)]?.focus();
-    if (pasted.length === 6) submitCode(pasted);
-  };
-
   async function submitCode(fullCode: string) {
+    if (!fullCode.trim()) return;
     setLoading(true);
     try {
       const res = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: fullCode }),
+        body: JSON.stringify({ code: fullCode.trim() }),
       });
       const data = await res.json();
 
       if (!res.ok || !data.valid) {
         setShake(true);
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        setCode("");
         setTimeout(() => setShake(false), 600);
         toast.error("That code doesn't match any story. Try again?");
         return;
@@ -95,24 +56,23 @@ export default function EntryScreen() {
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
       style={{ background: "var(--hero-gradient)" }}
     >
-      {/* Ambient blobs */}
       <ParallaxBlob size={500} top="-10%" left="-15%" color="accent" delay={0} />
       <ParallaxBlob size={400} bottom="-5%" right="-10%" color="secondary" delay={2} />
       <ParallaxBlob size={300} top="40%" left="60%" color="muted" delay={4} />
 
-      {/* Floating hearts bg */}
+      {/* Floating hearts */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {Array.from({ length: 12 }).map((_, i) => (
           <div
             key={i}
-            className="absolute text-2xl select-none"
+            className="absolute select-none"
             style={{
-              left: `${(i * 8.3) + 2}%`,
+              left: `${i * 8.3 + 2}%`,
               bottom: "-30px",
               opacity: 0.25,
               fontSize: `${10 + (i % 3) * 6}px`,
               color: "var(--particle-a)",
-              animation: `floatUp ${14 + i * 1.5}s ${i * 1.2}s ease-in-out infinite, sway ${4 + i % 3}s ${i * 0.5}s ease-in-out infinite alternate`,
+              animation: `floatUp ${14 + i * 1.5}s ${i * 1.2}s ease-in-out infinite, sway ${4 + (i % 3)}s ${i * 0.5}s ease-in-out infinite alternate`,
             }}
           >
             {i % 3 === 0 ? "♥" : i % 3 === 1 ? "✦" : "·"}
@@ -120,14 +80,13 @@ export default function EntryScreen() {
         ))}
       </div>
 
-      {/* Main card */}
+      {/* Card */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="glass-card-strong relative z-10 w-full max-w-md mx-4 p-8 text-center"
       >
-        {/* Icon */}
         <motion.div
           animate={{ scale: [1, 1.15, 1] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -137,58 +96,46 @@ export default function EntryScreen() {
           ♥
         </motion.div>
 
-        <h1
-          className="font-display text-4xl font-light mb-2"
-          style={{ color: "var(--text-primary)" }}
-        >
+        <h1 className="font-display text-4xl font-light mb-2" style={{ color: "var(--text-primary)" }}>
           Luminary
         </h1>
-        <p
-          className="text-sm mb-8 tracking-wide"
-          style={{ color: "var(--text-muted)" }}
-        >
+        <p className="text-sm mb-8 tracking-wide" style={{ color: "var(--text-muted)" }}>
           Your love story, beautifully told
         </p>
 
-        <p
-          className="text-sm mb-4 font-medium"
-          style={{ color: "var(--text-secondary)" }}
-        >
+        <p className="text-sm mb-3 font-medium" style={{ color: "var(--text-secondary)" }}>
           Enter your secret code to begin
         </p>
 
-        {/* Code inputs */}
+        {/* Single code input */}
         <motion.div
           animate={shake ? { x: [-8, 8, -8, 8, 0] } : {}}
           transition={{ duration: 0.4 }}
-          className="flex gap-2 justify-center mb-6"
-          onPaste={handlePaste}
+          className="mb-5"
         >
-          {code.map((c, i) => (
-            <input
-              key={i}
-              ref={(el) => { inputRefs.current[i] = el; }}
-              type="text"
-              inputMode="text"
-              maxLength={1}
-              value={c}
-              onChange={(e) => handleInput(i, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(i, e)}
-              className="w-11 h-12 text-center text-lg font-medium rounded-xl transition-all duration-200 outline-none"
-              style={{
-                background: "var(--bg-secondary)",
-                border: `2px solid ${c ? "var(--accent-1)" : "var(--border-subtle)"}`,
-                color: "var(--text-primary)",
-                boxShadow: c ? "0 0 0 3px var(--accent-muted)" : "none",
-                fontFamily: "var(--font-ui)",
-              }}
-            />
-          ))}
+          <input
+            type="text"
+            value={code}
+            onChange={(e) => setCode(e.target.value.toLowerCase())}
+            onKeyDown={(e) => e.key === "Enter" && submitCode(code)}
+            placeholder="e.g. rose24"
+            maxLength={30}
+            autoComplete="off"
+            spellCheck={false}
+            className="w-full text-center text-xl font-medium tracking-widest rounded-2xl py-4 px-6 outline-none transition-all duration-200"
+            style={{
+              background: "var(--bg-secondary)",
+              border: `2px solid ${code ? "var(--accent-1)" : "var(--border-subtle)"}`,
+              color: "var(--text-primary)",
+              boxShadow: code ? "0 0 0 3px var(--accent-muted)" : "none",
+              fontFamily: "var(--font-ui)",
+            }}
+          />
         </motion.div>
 
         <button
-          onClick={() => submitCode(code.join(""))}
-          disabled={code.join("").length < 6 || loading}
+          onClick={() => submitCode(code)}
+          disabled={code.trim().length < 3 || loading}
           className="btn-accent w-full mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
@@ -205,17 +152,12 @@ export default function EntryScreen() {
           <p className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>
             Want to create your own love story?
           </p>
-          <Link
-            href="/setup"
-            className="text-sm font-medium transition-colors"
-            style={{ color: "var(--accent-1)" }}
-          >
+          <Link href="/setup" className="text-sm font-medium" style={{ color: "var(--accent-1)" }}>
             Start your journey →
           </Link>
         </div>
       </motion.div>
 
-      {/* Bottom tagline */}
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
