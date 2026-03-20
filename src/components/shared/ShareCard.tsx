@@ -88,7 +88,7 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
       ? `${window.location.origin}/journey/${couple.accessCode}`
       : `/journey/${couple.accessCode}`;
 
-  /* ── Canvas-based PNG download ── */
+  /* ── Canvas-based PNG download — mirrors CardPreview exactly ── */
   const handleDownload = useCallback(async () => {
     setDownloading(true);
     try {
@@ -99,7 +99,7 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
       const ctx = canvas.getContext("2d")!;
       ctx.scale(2, 2);
 
-      // background gradient
+      // ── background gradient (matches CardPreview) ──
       const bg = ctx.createLinearGradient(0, 0, W, H);
       bg.addColorStop(0,   pal.bgA);
       bg.addColorStop(0.5, pal.bgB);
@@ -107,147 +107,128 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, W, H);
 
-      // subtle radial glow blobs
-      const drawBlob = (x: number, y: number, r: number, hex: string, alpha: number) => {
-        const radial = ctx.createRadialGradient(x, y, 0, x, y, r);
+      // ── accent glow blobs ──
+      const drawBlob = (x: number, y: number, r: number, color: string, alpha: number) => {
         const a = Math.round(alpha * 255).toString(16).padStart(2, "0");
-        radial.addColorStop(0, `${hex}${a}`);
-        radial.addColorStop(1, `${hex}00`);
-        ctx.save();
-        ctx.fillStyle = radial;
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fill();
+        const radial = ctx.createRadialGradient(x, y, 0, x, y, r);
+        radial.addColorStop(0, `${color}${a}`);
+        radial.addColorStop(1, `${color}00`);
+        ctx.save(); ctx.fillStyle = radial;
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       };
-      const blobAlpha = pal.isDark ? 0.32 : 0.18;
-      drawBlob(120, 140, 200, pal.accent, blobAlpha);
-      drawBlob(W - 100, H - 100, 160, pal.accent, blobAlpha * 0.65);
+      drawBlob(-90, 140, 300, pal.accent, 0.25);
+      drawBlob(W * 0.72, H * 0.85, 200, pal.accent, 0.15);
 
-      // left glass panel
-      const px = 48, py = 48, pw = W - 316, ph = H - 96;
+      // ── left panel (63% width, uses pal.panelBg) ──
+      const pw = Math.round(W * 0.63);
+      const px = 0, py = 0, ph = H;
       ctx.save();
-      ctx.globalAlpha = pal.isDark ? 0.07 : 0.5;
-      ctx.fillStyle = "#ffffff";
-      roundRect(ctx, px, py, pw, ph, 20);
+      ctx.fillStyle = pal.panelBg;
+      roundRect(ctx, px, py, pw, ph, 0);
       ctx.fill();
       ctx.restore();
-      if (pal.isDark) {
-        // extra accent tint for velvet panel visibility
-        ctx.save();
-        ctx.globalAlpha = 0.06;
-        ctx.fillStyle = pal.accent;
-        roundRect(ctx, px, py, pw, ph, 20);
-        ctx.fill();
-        ctx.restore();
-      }
+      // right border
       ctx.save();
       ctx.strokeStyle = pal.panelBorder;
-      ctx.lineWidth = 1.5;
-      roundRect(ctx, px, py, pw, ph, 20);
-      ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pw, 0); ctx.lineTo(pw, H); ctx.stroke();
       ctx.restore();
 
+      const pad = Math.round(W * 0.07); // 7% padding like CSS
+
       // luminary label
+      ctx.save();
       ctx.fillStyle = pal.accent;
       ctx.globalAlpha = 0.9;
-      ctx.font = "500 13px Arial, sans-serif";
-      ctx.fillText("L U M I N A R Y  \u2665", px + 32, py + 44);
-      ctx.globalAlpha = 1;
+      ctx.font = "500 11px Arial, sans-serif";
+      ctx.fillText("L U M I N A R Y  \u2665", pad, pad + 18);
+      ctx.restore();
 
       // couple names
-      const nameSize = couple.partner1Name.length + couple.partner2Name.length > 20 ? 36 : 44;
+      const totalChars = couple.partner1Name.length + couple.partner2Name.length;
+      const nameSize = totalChars > 22 ? 32 : totalChars > 16 ? 38 : 44;
       ctx.fillStyle = pal.text;
-      ctx.font = `300 ${nameSize}px Georgia, 'Times New Roman', serif`;
-      ctx.fillText(
-        `${couple.partner1Name}  &  ${couple.partner2Name}`,
-        px + 32, py + 100, pw - 64
-      );
+      ctx.font = `300 ${nameSize}px Georgia, serif`;
+      const nameY = Math.round(H * 0.46);
+      ctx.fillText(couple.partner1Name, pad, nameY, pw - pad * 2);
+      ctx.fillStyle = pal.muted;
+      ctx.fillText("  &  ", pad + ctx.measureText(couple.partner1Name).width, nameY);
+      ctx.fillStyle = pal.text;
+      const andW = ctx.measureText("  &  ").width;
+      ctx.fillText(couple.partner2Name, pad + ctx.measureText(couple.partner1Name).width + andW, nameY, pw - pad * 2);
 
       // accent underline
-      const lineGrad = ctx.createLinearGradient(px + 32, 0, px + 112, 0);
+      const lineGrad = ctx.createLinearGradient(pad, 0, pad + 80, 0);
       lineGrad.addColorStop(0, pal.accent);
       lineGrad.addColorStop(1, `${pal.accent}00`);
       ctx.fillStyle = lineGrad;
-      ctx.fillRect(px + 32, py + 114, 80, 2);
+      ctx.fillRect(pad, nameY + 10, 80, 2);
 
       // since date
-      ctx.fillStyle = pal.isDark ? "rgba(210,210,230,0.9)" : `${pal.muted}cc`;
-      ctx.font = "italic 16px Georgia, serif";
-      ctx.fillText(`Since ${formatDate(couple.startDate)}`, px + 32, py + 152);
+      ctx.fillStyle = pal.muted;
+      ctx.font = "italic 14px Georgia, serif";
+      ctx.fillText(`Since ${formatDate(couple.startDate)}`, pad, nameY + 34);
 
       // bio
       if (couple.bio) {
-        ctx.fillStyle = pal.isDark ? "rgba(190,190,215,0.75)" : `${pal.muted}88`;
-        ctx.font = "14px Arial, sans-serif";
-        const maxW = pw - 80;
+        ctx.fillStyle = pal.muted;
+        ctx.globalAlpha = 0.8;
+        ctx.font = "13px Arial, sans-serif";
+        const maxBioW = pw - pad * 2;
         let bioLine = "";
         for (const word of couple.bio.split(" ")) {
           const test = bioLine ? bioLine + " " + word : word;
-          if (ctx.measureText(test).width > maxW) break;
+          if (ctx.measureText(test).width > maxBioW) break;
           bioLine = test;
         }
-        ctx.fillText(bioLine + (bioLine !== couple.bio ? "\u2026" : ""), px + 32, py + 190);
+        ctx.fillText(bioLine + (bioLine !== couple.bio ? "\u2026" : ""), pad, nameY + 56);
+        ctx.globalAlpha = 1;
       }
 
-      // stats row
-      const statsY = py + ph - 68;
-      ctx.strokeStyle = pal.isDark ? "rgba(255,255,255,0.1)" : `${pal.accent}30`;
+      // stats divider
+      const statsY = Math.round(H * 0.82);
+      ctx.strokeStyle = pal.panelBorder;
       ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(px + 32, statsY - 16);
-      ctx.lineTo(px + pw - 32, statsY - 16);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pad, statsY - 14); ctx.lineTo(pw - pad, statsY - 14); ctx.stroke();
 
+      // stats
       const stats = [
         { val: days.toLocaleString(), label: "days together" },
         { val: duration,              label: "of love"        },
         { val: String(totalMoments),  label: "memories"       },
       ];
-      let sx = px + 32;
+      let sx = pad;
       for (const s of stats) {
         ctx.fillStyle = pal.accent;
-        ctx.font = "600 22px Arial, sans-serif";
+        ctx.font = "600 20px Arial, sans-serif";
         ctx.fillText(s.val, sx, statsY);
-        ctx.fillStyle = pal.isDark ? "rgba(190,190,215,0.75)" : `${pal.muted}bb`;
-        ctx.font = "12px Arial, sans-serif";
-        ctx.fillText(s.label, sx, statsY + 20);
-        sx += 120;
+        ctx.fillStyle = pal.muted;
+        ctx.font = "11px Arial, sans-serif";
+        ctx.fillText(s.label, sx, statsY + 18);
+        sx += Math.round((pw - pad * 2) / 3);
       }
 
-      // QR panel
-      const qx = W - 256, qy = 48, qw = 208, qh = H - 96;
+      // ── right QR panel (35% width, uses pal.qrPanelBg) ──
+      const qx = pw + 1, qy = 0, qw = W - pw - 1, qh = H;
       ctx.save();
-      ctx.globalAlpha = pal.isDark ? 0.07 : 0.45;
-      ctx.fillStyle = "#ffffff";
-      roundRect(ctx, qx, qy, qw, qh, 20);
+      ctx.fillStyle = pal.qrPanelBg;
+      roundRect(ctx, qx, qy, qw, qh, 0);
       ctx.fill();
       ctx.restore();
-      if (pal.isDark) {
-        ctx.save();
-        ctx.globalAlpha = 0.18;
-        ctx.fillStyle = pal.accent;
-        roundRect(ctx, qx, qy, qw, qh, 20);
-        ctx.fill();
-        ctx.restore();
-      }
-      ctx.save();
-      ctx.strokeStyle = pal.panelBorder;
-      ctx.lineWidth = 1.5;
-      roundRect(ctx, qx, qy, qw, qh, 20);
-      ctx.stroke();
-      ctx.restore();
 
-      ctx.fillStyle = pal.isDark ? "rgba(210,210,230,0.9)" : `${pal.muted}99`;
-      ctx.font = "11px Arial, sans-serif";
+      const qCx = qx + qw / 2; // centre x of QR panel
+
+      ctx.fillStyle = pal.muted;
+      ctx.font = "500 10px Arial, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("SCAN TO VISIT", qx + qw / 2, qy + 32);
-      ctx.fillText("OUR JOURNEY", qx + qw / 2, qy + 48);
+      ctx.fillText("SCAN TO VISIT", qCx, Math.round(H * 0.22));
+      ctx.fillText("OUR JOURNEY",   qCx, Math.round(H * 0.22) + 16);
 
       // QR image
-      const qrSize = 134;
+      const qrSize = Math.round(qw * 0.58);
       const qrX = qx + (qw - qrSize) / 2;
-      const qrY = qy + 68;
+      const qrY = Math.round(H * 0.32);
 
       await new Promise<void>((resolve) => {
         const img = new Image();
@@ -255,7 +236,7 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
         img.onload = () => {
           ctx.save();
           ctx.fillStyle = "#ffffff";
-          roundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
+          roundRect(ctx, qrX - 7, qrY - 7, qrSize + 14, qrSize + 14, 10);
           ctx.fill();
           ctx.restore();
           ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
@@ -266,13 +247,14 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
       });
 
       ctx.fillStyle = pal.accent;
-      ctx.font = "22px serif";
-      ctx.textAlign = "center";
-      ctx.fillText("\u2665", qx + qw / 2, qrY + qrSize + 40);
+      ctx.font = "20px serif";
+      ctx.fillText("\u2665", qCx, qrY + qrSize + 32);
 
-      ctx.fillStyle = pal.isDark ? "rgba(190,190,215,0.65)" : `${pal.muted}66`;
-      ctx.font = "11px Arial, sans-serif";
-      ctx.fillText("luminary.love", qx + qw / 2, qrY + qrSize + 60);
+      ctx.fillStyle = pal.muted;
+      ctx.globalAlpha = 0.7;
+      ctx.font = "10px Arial, sans-serif";
+      ctx.fillText("luminary.love", qCx, qrY + qrSize + 52);
+      ctx.globalAlpha = 1;
       ctx.textAlign = "left";
 
       const link = document.createElement("a");
