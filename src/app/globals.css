@@ -239,20 +239,6 @@ body {
   box-shadow: 0 0 0 4px var(--accent-muted), var(--shadow-glow);
 }
 
-/* ── FLOW CARD: mobile = full width with left-spine offset
-      desktop   = 44% wide, positioned via --card-ml CSS variable ── */
-.flow-card {
-  padding-left: 3rem;
-  width: 100%;
-}
-
-@media (min-width: 768px) {
-  .flow-card {
-    padding-left: 0;
-    width: 44%;
-    margin-left: var(--card-ml, 0%);
-  }
-}
 
 /* ── SELECTION ── */
 ::selection {

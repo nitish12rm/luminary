@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, useAnimationControls, useInView } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { IMoment, ICouple } from "@/types";
 import { getCategoryById } from "@/lib/categories";
 import { formatDate } from "@/lib/utils";
@@ -10,192 +10,208 @@ interface Props {
   moment: IMoment;
   couple: ICouple;
   index: number;
-  isLeft: boolean;
 }
 
-export default function TimelineNode({ moment, index, isLeft }: Props) {
-  const ref       = useRef<HTMLDivElement>(null);
-  const inView    = useInView(ref, { once: true, margin: "-80px" });
-  const controls  = useAnimationControls();
+// Custom ease — fast start, silky deceleration (signature of editorial reveals)
+const EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-  const [photoOpen, setPhotoOpen] = useState(false);
-  const [showRaw,   setShowRaw]   = useState(false);
+/**
+ * Reveal — wraps children in an overflow:hidden container.
+ * The inner div slides up from below, giving the "text emerges
+ * from behind a baseline" effect characteristic of Wondrous/Awwwards sites.
+ */
+function Reveal({
+  children,
+  delay = 0,
+  inView,
+  duration = 0.78,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  inView: boolean;
+  duration?: number;
+  className?: string;
+}) {
+  return (
+    <div className={`overflow-hidden ${className}`}>
+      <motion.div
+        initial={{ y: "108%", opacity: 0 }}
+        animate={
+          inView
+            ? { y: "0%", opacity: 1 }
+            : { y: "108%", opacity: 0 }
+        }
+        transition={{ duration, ease: EXPO, delay }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
 
-  const cat         = getCategoryById(moment.category);
-  const displayText = !showRaw && moment.poeticNarrative
-    ? moment.poeticNarrative
-    : moment.rawDescription;
+export default function TimelineNode({
+  moment,
+  index,
+  couple: _couple,
+}: Props) {
+  const ref    = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
 
-  // Each card floats at its own speed and amplitude — no synchronized bobbing
-  const floatDuration = 4 + (index % 5) * 0.7;
-  const floatY        = 5 + (index % 4) * 1.5;
-  const floatRotate   = 0.25 + (index % 3) * 0.1;
+  const [showRaw,    setShowRaw]    = useState(false);
+  const [photoOpen,  setPhotoOpen]  = useState(false);
 
-  useEffect(() => {
-    if (!inView) return;
-    const run = async () => {
-      await controls.start("visible");
-      controls.start("floating");
-    };
-    run();
-  }, [inView, controls]);
+  const cat   = getCategoryById(moment.category);
+  const label =
+    moment.category === "custom" && moment.customLabel
+      ? moment.customLabel
+      : cat.label;
 
-  const variants = {
-    hidden: {
-      opacity: 0,
-      x:       isLeft ? -80 : 80,
-      y:       24,
-      rotate:  isLeft ? -4 : 4,
-      scale:   0.86,
-    },
-    visible: {
-      opacity: 1,
-      x:       0,
-      y:       0,
-      rotate:  0,
-      scale:   1,
-      transition: {
-        type:      "spring",
-        stiffness: 60,
-        damping:   17,
-        mass:      1.1,
-        delay:     (index % 3) * 0.04,
-      },
-    },
-    floating: {
-      y:      [0, -floatY, 0, -floatY * 0.55, 0],
-      rotate: [0, floatRotate, 0, -floatRotate * 0.7, 0],
-      transition: {
-        duration: floatDuration,
-        repeat:   Infinity,
-        ease:     "easeInOut",
-      },
-    },
-  };
+  const displayText =
+    !showRaw && moment.poeticNarrative
+      ? moment.poeticNarrative
+      : moment.rawDescription;
+
+  // Photo appears before or after text based on index — adds visual rhythm
+  const photoFirst = index % 2 === 0;
 
   return (
     <>
-      <motion.div
-        ref={ref}
-        initial="hidden"
-        animate={controls}
-        variants={variants}
-        whileHover={{
-          y: -6,
-          scale: 1.015,
-          transition: { type: "spring", stiffness: 350, damping: 22 },
-        }}
-      >
-        <div
-          className="glass-card-strong overflow-hidden"
-          style={{ cursor: "default" }}
+      <article ref={ref} className="relative">
+
+        {/* ── Ghost chapter number (decorative) ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 1.6, delay: 0.05, ease: "easeOut" }}
+          className="absolute -top-3 right-0 select-none pointer-events-none overflow-hidden leading-none"
+          aria-hidden
         >
-          {/* ── Photo ── */}
-          {moment.photoPath && (
-            <div
-              className="relative w-full overflow-hidden cursor-pointer"
-              style={{ height: "180px" }}
-              onClick={() => setPhotoOpen(true)}
-            >
-              <motion.img
-                src={moment.photoPath}
-                alt={moment.photoAlt || cat.label}
-                className="w-full h-full object-cover"
-                whileHover={{ scale: 1.07 }}
-                transition={{ duration: 0.55, ease: "easeOut" }}
-              />
-              {/* Hover overlay */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-                transition={{ duration: 0.25 }}
-                className="absolute inset-0 flex items-center justify-center"
-                style={{ background: "rgba(0,0,0,0.22)" }}
-              >
-                <span className="text-white/90 text-4xl">⊕</span>
-              </motion.div>
-              {/* Subtle gradient overlay at bottom */}
-              <div
-                className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
-                style={{
-                  background: "linear-gradient(to top, var(--bg-card), transparent)",
-                }}
-              />
-            </div>
-          )}
+          <span
+            className="font-display font-light"
+            style={{
+              fontSize: "clamp(4.5rem, 22vw, 8rem)",
+              color: "var(--accent-1)",
+              opacity: 0.055,
+              letterSpacing: "-0.05em",
+              display: "block",
+            }}
+          >
+            {String(index + 1).padStart(2, "0")}
+          </span>
+        </motion.div>
 
-          {/* ── Body ── */}
-          <div className="p-5">
-            {/* Category pill + date */}
-            <div className="flex items-start justify-between gap-2 mb-4">
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={inView ? { opacity: 1, x: 0 } : {}}
-                transition={{ delay: 0.55, duration: 0.4 }}
-                className="inline-flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full flex-shrink-0"
-                style={{
-                  background: "var(--accent-muted)",
-                  color:      "var(--accent-1)",
-                  border:     "1px solid var(--border-subtle)",
-                }}
-              >
-                <span>{cat.emoji}</span>
-                <span>
-                  {moment.category === "custom" && moment.customLabel
-                    ? moment.customLabel
-                    : cat.label}
+        {/* ── Content ── */}
+        <div className="relative z-10">
+
+          {/* Row: category label + date */}
+          <div className="flex items-center justify-between gap-3 mb-5">
+            <Reveal inView={inView} delay={0}>
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: "1rem", lineHeight: 1 }}>{cat.emoji}</span>
+                <span
+                  className="font-semibold uppercase"
+                  style={{
+                    fontSize: "9.5px",
+                    letterSpacing: "0.22em",
+                    color: "var(--accent-1)",
+                  }}
+                >
+                  {label}
                 </span>
-              </motion.span>
+              </div>
+            </Reveal>
 
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={inView ? { opacity: 1 } : {}}
-                transition={{ delay: 0.65, duration: 0.4 }}
-                className="text-[11px] mt-1 leading-tight text-right"
-                style={{ color: "var(--text-muted)" }}
+            <Reveal inView={inView} delay={0.06}>
+              <span
+                style={{
+                  fontSize: "11px",
+                  color: "var(--text-muted)",
+                  fontVariantNumeric: "tabular-nums",
+                  whiteSpace: "nowrap",
+                }}
               >
                 {formatDate(moment.date)}
-              </motion.span>
-            </div>
+              </span>
+            </Reveal>
+          </div>
 
-            {/* Narrative text */}
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.5, duration: 0.55 }}
-              className={`leading-[1.9] ${
+          {/* Accent rule — expands from left */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.12 }}
+            className="h-px mb-7"
+            style={{
+              background: "var(--timeline-line)",
+              transformOrigin: "left",
+            }}
+          />
+
+          {/* Photo — even-indexed moments show photo FIRST */}
+          {moment.photoPath && photoFirst && (
+            <PhotoBlock
+              photoPath={moment.photoPath}
+              photoAlt={moment.photoAlt || label}
+              inView={inView}
+              delay={0.2}
+              onOpen={() => setPhotoOpen(true)}
+              className="mb-7"
+            />
+          )}
+
+          {/* Narrative */}
+          <Reveal inView={inView} delay={moment.photoPath && photoFirst ? 0.3 : 0.2}>
+            <p
+              className={
                 !showRaw && moment.poeticNarrative
-                  ? "font-display text-[1.02rem] italic"
-                  : "text-[0.9rem]"
-              }`}
-              style={{ color: "var(--text-primary)" }}
+                  ? "font-display italic"
+                  : ""
+              }
+              style={{
+                fontSize: "clamp(1.04rem, 3vw, 1.16rem)",
+                lineHeight: 1.95,
+                color: "var(--text-primary)",
+              }}
             >
               {displayText}
-            </motion.p>
+            </p>
+          </Reveal>
 
-            {/* Toggle poetic / raw */}
-            {moment.poeticNarrative && moment.rawDescription && (
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={inView ? { opacity: 1 } : {}}
-                transition={{ delay: 0.75 }}
+          {/* Photo — odd-indexed moments show photo AFTER text */}
+          {moment.photoPath && !photoFirst && (
+            <PhotoBlock
+              photoPath={moment.photoPath}
+              photoAlt={moment.photoAlt || label}
+              inView={inView}
+              delay={0.32}
+              onOpen={() => setPhotoOpen(true)}
+              className="mt-7"
+            />
+          )}
+
+          {/* Toggle poetic ↔ raw */}
+          {moment.poeticNarrative && moment.rawDescription && (
+            <Reveal inView={inView} delay={0.42} className="mt-5">
+              <button
                 onClick={() => setShowRaw(!showRaw)}
-                className="mt-4 text-[11px] flex items-center gap-1.5 transition-opacity hover:opacity-70"
-                style={{ color: "var(--text-muted)" }}
+                className="flex items-center gap-2 transition-opacity hover:opacity-55"
+                style={{ fontSize: "11px", color: "var(--text-muted)" }}
               >
                 <motion.span
-                  animate={{ rotate: showRaw ? 180 : 0 }}
+                  animate={{ rotate: showRaw ? 45 : 0 }}
                   transition={{ duration: 0.3 }}
                   style={{ color: "var(--accent-1)", display: "inline-block" }}
                 >
                   ✦
                 </motion.span>
                 {showRaw ? "Show poetic version" : "Show our words"}
-              </motion.button>
-            )}
-          </div>
+              </button>
+            </Reveal>
+          )}
+
         </div>
-      </motion.div>
+      </article>
 
       {/* ── Photo lightbox ── */}
       {photoOpen && moment.photoPath && (
@@ -204,23 +220,22 @@ export default function TimelineNode({ moment, index, isLeft }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.92)" }}
+          style={{ background: "rgba(0,0,0,0.93)" }}
           onClick={() => setPhotoOpen(false)}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <motion.img
-            initial={{ scale: 0.88, opacity: 0 }}
+            initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 22 }}
+            transition={{ duration: 0.45, ease: EXPO }}
             src={moment.photoPath}
-            alt={moment.photoAlt || cat.label}
+            alt={moment.photoAlt || label}
             className="max-w-full rounded-2xl object-contain"
             style={{ maxHeight: "88vh" }}
             onClick={(e) => e.stopPropagation()}
           />
           <button
-            className="absolute top-5 right-5 w-10 h-10 rounded-full flex items-center justify-center text-lg text-white transition-colors"
-            style={{ background: "rgba(255,255,255,0.12)" }}
+            className="absolute top-5 right-5 w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors"
+            style={{ background: "rgba(255,255,255,0.1)" }}
             onClick={() => setPhotoOpen(false)}
           >
             ✕
@@ -228,5 +243,61 @@ export default function TimelineNode({ moment, index, isLeft }: Props) {
         </motion.div>
       )}
     </>
+  );
+}
+
+/* ── PhotoBlock ────────────────────────────────────────────────── */
+function PhotoBlock({
+  photoPath,
+  photoAlt,
+  inView,
+  delay,
+  onOpen,
+  className = "",
+}: {
+  photoPath: string;
+  photoAlt: string;
+  inView: boolean;
+  delay: number;
+  onOpen: () => void;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      animate={
+        inView
+          ? { opacity: 1, y: 0, scale: 1 }
+          : { opacity: 0, y: 20, scale: 0.97 }
+      }
+      transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay }}
+      className={`relative overflow-hidden rounded-2xl cursor-pointer group ${className}`}
+      style={{ height: "clamp(210px, 52vw, 320px)" }}
+      onClick={onOpen}
+    >
+      <motion.img
+        src={photoPath}
+        alt={photoAlt}
+        className="w-full h-full object-cover"
+        whileHover={{ scale: 1.06 }}
+        transition={{ duration: 0.65, ease: "easeOut" }}
+      />
+      {/* Subtle dark overlay on hover */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
+        style={{ background: "rgba(0,0,0,0.15)" }}
+      >
+        <span className="text-white/75 text-4xl">⊕</span>
+      </div>
+      {/* Bottom fade so it sits nicely against the background */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to top, var(--bg-primary) 0%, transparent 100%)",
+          opacity: 0.4,
+        }}
+      />
+    </motion.div>
   );
 }
