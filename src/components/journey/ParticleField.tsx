@@ -72,50 +72,49 @@ function useLayerParallax(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ── BLUSH: love particles ──
-//   Rising hearts, pre-scattered via negative delay so they fill the screen.
+// ── BLUSH: heart rain ──
+//   Hearts scattered across the FULL screen at random positions, drifting
+//   gently downward while flickering — like rain viewed through a foggy window.
 //   3 depth layers with scroll parallax.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FloatingHearts() {
-  const layerA = useRef<HTMLDivElement>(null); // large ghost hearts  — most parallax
-  const layerB = useRef<HTMLDivElement>(null); // medium love symbols
-  const layerC = useRef<HTMLDivElement>(null); // tiny bits + twinkling sparkles
+  const layerA = useRef<HTMLDivElement>(null); // large ghost hearts — most parallax
+  const layerB = useRef<HTMLDivElement>(null); // medium raining hearts
+  const layerC = useRef<HTMLDivElement>(null); // tiny hearts + sparkle accents
 
-  const bigHearts    = useParticles(16);
-  const medHearts    = useParticles(28);
-  const smallBits    = useParticles(18);
-  const twinkleSpots = useParticles(12);
+  const ghostHearts = useParticles(14); // huge, faint, pulse in place
+  const rainHearts  = useParticles(32); // mid-size, drift down + flicker
+  const tinyHearts  = useParticles(22); // small, fast rain
 
   useLayerParallax([layerA, layerB, layerC], [0.05, 0.028, 0.012]);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
 
-      {/* Layer A — large ghost hearts, pulse with heartbeat */}
+      {/* Layer A — huge ghost hearts, pulse softly in fixed positions */}
       <div ref={layerA} className="absolute inset-0">
-        {bigHearts.map((p) => (
+        {ghostHearts.map((p) => (
           <div
             key={p.id}
             className="absolute select-none"
-            style={{ left: `${p.x}%`, bottom: "-5px", opacity: 0.09 }}
+            style={{
+              left:     `${p.x}%`,
+              top:      `${p.y}%`,
+              fontSize: `${p.size + 22}px`,
+              color:    p.id % 2 === 0 ? "var(--particle-a)" : "var(--particle-c)",
+              animation:`heartPulse ${p.swayDuration + 4}s ${p.negDelay}s ease-in-out infinite`,
+            }}
           >
-            <div style={{
-              fontSize:  `${p.size + 16}px`,
-              color:     p.id % 2 === 0 ? "var(--particle-a)" : "var(--particle-c)",
-              animation: `loveFloat ${p.duration + 10}s ${p.negDelay}s ease-in-out infinite,
-                          heartbeat  ${p.swayDuration + 2}s ${p.swayDelay}s ease-in-out infinite`,
-            }}>
-              {p.id % 2 === 0 ? "♥" : "♡"}
-            </div>
+            {p.id % 2 === 0 ? "♥" : "♡"}
           </div>
         ))}
       </div>
 
-      {/* Layer B — medium love symbols, gentle sway */}
+      {/* Layer B — medium hearts raining down with flicker */}
       <div ref={layerB} className="absolute inset-0">
-        {medHearts.map((p) => {
-          const SYM   = ["♥","❤","♡","❣","♥","✿","♡","❤","♥","♡"];
+        {rainHearts.map((p) => {
+          const SYM   = ["♥","❤","♡","❣","♥","♡","❤","♥"];
           const color = p.id % 3 === 0 ? "var(--particle-a)"
                       : p.id % 3 === 1 ? "var(--particle-b)"
                       :                  "var(--particle-c)";
@@ -123,13 +122,12 @@ function FloatingHearts() {
             <div
               key={p.id}
               className="absolute select-none"
-              style={{ left: `${p.x}%`, bottom: "-5px", opacity: p.opacity * 0.7 }}
+              style={{ left: `${p.x}%`, top: "-4px", opacity: p.opacity * 0.82 }}
             >
               <div style={{
                 fontSize:  `${p.size}px`,
                 color,
-                animation: `loveFloat ${p.duration}s ${p.negDelay}s ease-in-out infinite,
-                            sway       ${p.swayDuration}s ${p.swayDelay}s ease-in-out infinite alternate`,
+                animation: `heartRain ${p.duration + 4}s ${p.negDelay}s ease-in-out infinite`,
               }}>
                 {SYM[p.id % SYM.length]}
               </div>
@@ -138,43 +136,23 @@ function FloatingHearts() {
         })}
       </div>
 
-      {/* Layer C — tiny rising bits */}
+      {/* Layer C — tiny fast hearts + scattered sparkle accents */}
       <div ref={layerC} className="absolute inset-0">
-        {smallBits.map((p) => {
-          const SYM = ["·","✦","✧","·","✦","✩","·","·"];
+        {tinyHearts.map((p) => {
+          const SYM = ["♥","·","♡","✦","♥","·","✧","♡"];
           return (
             <div
               key={p.id}
               className="absolute select-none"
-              style={{ left: `${p.x}%`, bottom: "-5px", opacity: p.opacity * 0.45 }}
+              style={{ left: `${p.x}%`, top: "-4px", opacity: p.opacity * 0.5 }}
             >
               <div style={{
-                fontSize:  `${p.size * 0.45 + 4}px`,
+                fontSize:  `${p.size * 0.5 + 5}px`,
                 color:     p.id % 2 === 0 ? "var(--particle-a)" : "var(--particle-b)",
-                animation: `loveFloat ${p.duration * 0.7}s ${p.negDelay}s ease-in-out infinite`,
+                animation: `heartRain ${p.duration * 0.65}s ${p.negDelay}s ease-in-out infinite`,
               }}>
                 {SYM[p.id % SYM.length]}
               </div>
-            </div>
-          );
-        })}
-
-        {/* Twinkling sparkles already scattered across screen by top: y% */}
-        {twinkleSpots.map((p) => {
-          const SYM = ["✦","✧","✿","❀","✩","❋","✦","✧"];
-          return (
-            <div
-              key={`tw${p.id}`}
-              className="absolute select-none"
-              style={{
-                left:      `${p.x}%`,
-                top:       `${p.y}%`,
-                fontSize:  `${p.size * 0.5 + 5}px`,
-                color:     p.id % 2 === 0 ? "var(--particle-a)" : "var(--particle-c)",
-                animation: `twinkle ${p.swayDuration + 2.5}s ${p.negDelay}s ease-in-out infinite`,
-              }}
-            >
-              {SYM[p.id % SYM.length]}
             </div>
           );
         })}
@@ -416,93 +394,142 @@ function FloatingStars() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ── SCRAPBOOK: glitter ──
-//   Sparkles/symbols scattered across the full screen, popping and drifting.
-//   3 depth layers with scroll parallax.
+// ── SCRAPBOOK: paper confetti + washi tape + stickers ──
+//   Distinctly crafted feel:
+//     Layer A — washi tape strips (actual CSS rectangles with stripe pattern)
+//     Layer B — paper confetti squares tumbling & flipping
+//     Layer C — tiny sticker chars (★ ♥ ✂ ☆) + micro confetti dots
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Washi tape stripe patterns — each a repeating diagonal gradient
+const WASHI = [
+  // pink
+  `repeating-linear-gradient(-45deg,#ff4da6 0px,#ff4da6 4px,#ffb3e0 4px,#ffb3e0 8px)`,
+  // yellow
+  `repeating-linear-gradient(-45deg,#ffe566 0px,#ffe566 4px,#fff3a0 4px,#fff3a0 8px)`,
+  // mint
+  `repeating-linear-gradient(-45deg,#40c8c0 0px,#40c8c0 4px,#a0f0ec 4px,#a0f0ec 8px)`,
+  // lavender
+  `repeating-linear-gradient(-45deg,#c77dff 0px,#c77dff 4px,#e8c0ff 4px,#e8c0ff 8px)`,
+  // coral
+  `repeating-linear-gradient(-45deg,#ff7055 0px,#ff7055 4px,#ffb0a0 4px,#ffb0a0 8px)`,
+  // sky
+  `repeating-linear-gradient(-45deg,#60c8ff 0px,#60c8ff 4px,#b0e4ff 4px,#b0e4ff 8px)`,
+];
+
+// Solid confetti colours
+const CONFETTI_COLORS = [
+  "#ff4da6","#ffe566","#40c8c0","#c77dff",
+  "#ff7055","#60c8ff","#80ffcc","#ffb347",
+];
+
 function ScrapbookGlitter() {
-  const layerA = useRef<HTMLDivElement>(null);
-  const layerB = useRef<HTMLDivElement>(null);
-  const layerC = useRef<HTMLDivElement>(null);
+  const layerA = useRef<HTMLDivElement>(null); // washi tape strips
+  const layerB = useRef<HTMLDivElement>(null); // paper confetti
+  const layerC = useRef<HTMLDivElement>(null); // sticker chars + tiny bits
 
-  const bigGlitter = useParticles(16);
-  const medGlitter = useParticles(26);
-  const tiny       = useParticles(20);
+  const washiP    = useParticles(18);
+  const confettiP = useParticles(28);
+  const stickerP  = useParticles(24);
 
-  useLayerParallax([layerA, layerB, layerC], [0.045, 0.024, 0.01]);
-
-  const COLORS = [
-    "var(--particle-a)", "var(--particle-b)", "var(--particle-c)",
-    "#40c8c0", "#ff8fcc", "#ffb3e0", "#ffe566", "#c77dff",
-  ];
+  useLayerParallax([layerA, layerB, layerC], [0.05, 0.028, 0.012]);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
 
-      {/* Layer A — large sparkle symbols */}
+      {/* Layer A — washi tape strips tumbling down */}
       <div ref={layerA} className="absolute inset-0">
-        {bigGlitter.map((p) => {
-          const SYM = ["✦","★","◆","✱","❋","✦","★","◆"];
+        {washiP.map((p) => {
+          const w = p.size * 3.5 + 20; // 48–90 px wide
+          const h = p.size * 0.7 + 8;  // 14–20 px tall
           return (
             <div
               key={p.id}
-              className="absolute select-none"
+              className="absolute"
               style={{
-                left:      `${p.x}%`,
-                top:       `${p.y}%`,
-                fontSize:  `${p.size * 0.7 + 7}px`,
-                color:     COLORS[p.id % COLORS.length],
-                animation: `glitterPop ${p.swayDuration + 2}s ${p.negDelay}s ease-in-out infinite,
-                            glitterDrift ${p.duration * 0.6}s ${p.swayDelay * -0.5}s ease-in-out infinite`,
+                left:    `${p.x}%`,
+                top:     "-20px",
+                width:   `${w}px`,
+                height:  `${h}px`,
+                borderRadius: "2px",
+                background:   WASHI[p.id % WASHI.length],
+                opacity:      0,
+                animation:    `washiFall ${p.duration + 4}s ${p.negDelay}s ease-in-out infinite`,
               }}
-            >
-              {SYM[p.id % SYM.length]}
-            </div>
+            />
           );
         })}
       </div>
 
-      {/* Layer B — medium mixed symbols with drift */}
+      {/* Layer B — paper confetti rectangles & squares */}
       <div ref={layerB} className="absolute inset-0">
-        {medGlitter.map((p) => {
-          const SYM = ["✦","✧","★","✩","◆","◇","✱","✲","❋","·","♥","✿","✦","✧"];
+        {confettiP.map((p) => {
+          // alternate squares and wider rectangles
+          const isRect = p.id % 3 !== 0;
+          const w = isRect ? p.size * 1.6 + 5 : p.size * 0.9 + 4;
+          const h = p.size * 0.7 + 3;
+          const color = CONFETTI_COLORS[p.id % CONFETTI_COLORS.length];
           return (
+            <div
+              key={p.id}
+              className="absolute"
+              style={{
+                left:         `${p.x}%`,
+                top:          "-10px",
+                width:        `${w}px`,
+                height:       `${h}px`,
+                borderRadius: "1px",
+                background:   color,
+                opacity:      0,
+                animation:    `confettiFall ${p.duration}s ${p.negDelay}s linear infinite`,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {/* Layer C — sticker chars + tiny confetti dots */}
+      <div ref={layerC} className="absolute inset-0">
+        {stickerP.map((p) => {
+          // odd ones are tiny confetti dots, even ones are sticker chars
+          const isDot = p.id % 4 === 0;
+          const STICKERS = ["★","♥","✂","☆","✿","★","♥","☆","✂","✿"];
+          const color = CONFETTI_COLORS[p.id % CONFETTI_COLORS.length];
+
+          return isDot ? (
+            // Tiny confetti dot
+            <div
+              key={p.id}
+              className="absolute rounded-full"
+              style={{
+                left:      `${p.x}%`,
+                top:       "-6px",
+                width:     `${p.size * 0.4 + 3}px`,
+                height:    `${p.size * 0.4 + 3}px`,
+                background: color,
+                opacity:   0,
+                animation: `confettiFall ${p.duration * 0.7}s ${p.negDelay}s linear infinite`,
+              }}
+            />
+          ) : (
+            // Sticker character
             <div
               key={p.id}
               className="absolute select-none"
               style={{
                 left:      `${p.x}%`,
-                top:       `${p.y}%`,
-                fontSize:  `${p.size * 0.55 + 5}px`,
-                color:     COLORS[p.id % COLORS.length],
-                animation: `glitterPop ${p.swayDuration + 1.5}s ${p.negDelay}s ease-in-out infinite,
-                            glitterDrift ${p.duration * 0.7}s ${p.swayDelay * -0.3}s ease-in-out infinite`,
+                top:       "-6px",
+                fontSize:  `${p.size * 0.6 + 7}px`,
+                color,
+                fontWeight: 700,
+                opacity:   0,
+                animation: `confettiFall ${p.duration * 0.85}s ${p.negDelay}s ease-in-out infinite`,
               }}
             >
-              {SYM[p.id % SYM.length]}
+              {STICKERS[p.id % STICKERS.length]}
             </div>
           );
         })}
-      </div>
-
-      {/* Layer C — tiny glitter bits */}
-      <div ref={layerC} className="absolute inset-0">
-        {tiny.map((p) => (
-          <div
-            key={p.id}
-            className="absolute select-none"
-            style={{
-              left:      `${p.x}%`,
-              top:       `${p.y}%`,
-              fontSize:  `${p.size * 0.35 + 3}px`,
-              color:     COLORS[p.id % COLORS.length],
-              animation: `glitterPop ${p.swayDuration + 1}s ${p.negDelay}s ease-in-out infinite`,
-            }}
-          >
-            {p.id % 3 === 0 ? "·" : p.id % 3 === 1 ? "✦" : "✧"}
-          </div>
-        ))}
       </div>
     </div>
   );
