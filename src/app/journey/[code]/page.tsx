@@ -65,7 +65,7 @@ export default async function JourneyPage({ params }: Props) {
           <Timeline moments={moments} couple={couple} />
         </div>
 
-        <ThemeSwitcher defaultTheme={couple.theme} coupleId={couple._id} />
+        <ThemeSwitcher defaultTheme={couple.theme} coupleId={couple._id} couple={couple} totalMoments={moments.length} />
       </main>
     </ThemeProvider>
   );

@@ -3,12 +3,15 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { THEMES } from "@/lib/themes";
-import { ThemeId } from "@/types";
+import { ThemeId, ICouple } from "@/types";
 import { themeStorageKey } from "./ThemeProvider";
+import ShareCard from "./ShareCard";
 
 interface Props {
   defaultTheme: ThemeId;
   coupleId: string;
+  couple?: ICouple;
+  totalMoments?: number;
 }
 
 const THEME_EMOJIS: Record<ThemeId, string> = {
@@ -20,9 +23,10 @@ const THEME_EMOJIS: Record<ThemeId, string> = {
 
 const EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-export default function ThemeSwitcher({ defaultTheme, coupleId }: Props) {
-  const [open,   setOpen]   = useState(false);
-  const [active, setActive] = useState<ThemeId>(defaultTheme);
+export default function ThemeSwitcher({ defaultTheme, coupleId, couple, totalMoments }: Props) {
+  const [open,      setOpen]      = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [active,    setActive]    = useState<ThemeId>(defaultTheme);
   const panelRef = useRef<HTMLDivElement>(null);
 
   // Sync with whatever ThemeProvider restored from localStorage
@@ -32,7 +36,7 @@ export default function ThemeSwitcher({ defaultTheme, coupleId }: Props) {
     if (stored && VALID.includes(stored)) setActive(stored);
   }, [coupleId]);
 
-  // Close on outside click
+  // Close theme panel on outside click
   useEffect(() => {
     if (!open) return;
     function onPointerDown(e: PointerEvent) {
@@ -44,6 +48,14 @@ export default function ThemeSwitcher({ defaultTheme, coupleId }: Props) {
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open]);
 
+  // Close share modal on Escape
+  useEffect(() => {
+    if (!shareOpen) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setShareOpen(false); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [shareOpen]);
+
   function pick(id: ThemeId) {
     setActive(id);
     document.documentElement.setAttribute("data-theme", id);
@@ -54,6 +66,7 @@ export default function ThemeSwitcher({ defaultTheme, coupleId }: Props) {
   const current = THEMES.find((t) => t.id === active) ?? THEMES[0];
 
   return (
+    <>
     <div ref={panelRef} className="fixed bottom-6 right-5 z-50 flex flex-col items-end gap-3">
 
       {/* ── Theme panel ── */}
@@ -155,7 +168,7 @@ export default function ThemeSwitcher({ defaultTheme, coupleId }: Props) {
         )}
       </AnimatePresence>
 
-      {/* ── Trigger button ── */}
+      {/* ── Theme trigger button ── */}
       <motion.button
         whileHover={{ scale: 1.1  }}
         whileTap={{   scale: 0.92 }}
@@ -179,6 +192,69 @@ export default function ThemeSwitcher({ defaultTheme, coupleId }: Props) {
         </motion.span>
       </motion.button>
 
+      {/* ── Share button ── */}
+      {couple && (
+        <motion.button
+          whileHover={{ scale: 1.1  }}
+          whileTap={{   scale: 0.92 }}
+          onClick={() => setShareOpen(true)}
+          aria-label="Share journey card"
+          className="w-11 h-11 rounded-full flex items-center justify-center transition-shadow"
+          style={{
+            background: "var(--bg-card)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid var(--border-subtle)",
+            boxShadow: "var(--shadow-card)",
+            color: "var(--text-secondary)",
+          }}
+        >
+          {/* Share icon */}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+        </motion.button>
+      )}
+
     </div>
+
+    {/* ── Share modal (full-screen overlay) ── */}
+    {couple && shareOpen && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+        style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)" }}
+        onClick={() => setShareOpen(false)}
+      >
+        <motion.div
+          initial={{ scale: 0.92, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          onClick={(e) => e.stopPropagation()}
+          className="flex flex-col items-center w-full max-w-xl"
+        >
+          <div className="w-full mb-3 flex justify-between items-center">
+            <p style={{ fontSize: "11px", letterSpacing: "0.2em", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>
+              Share your journey
+            </p>
+            <button
+              onClick={() => setShareOpen(false)}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-colors"
+              style={{ background: "rgba(255,255,255,0.1)" }}
+            >
+              ✕
+            </button>
+          </div>
+          <ShareCard couple={couple} totalMoments={totalMoments ?? 0} />
+        </motion.div>
+      </motion.div>
+    )}
+    </>
   );
 }

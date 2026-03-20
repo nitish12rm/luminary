@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { ICouple } from "@/types";
 import { formatDate, getDays } from "@/lib/utils";
 import ParallaxBlob from "@/components/shared/ParallaxBlob";
-import { ShareCardModal } from "@/components/shared/ShareCard";
 
 interface Props {
   couple: ICouple;
@@ -118,15 +117,6 @@ export default function JourneyHero({ couple, totalMoments }: Props) {
           <StatPill value={`${totalMoments}`} label={totalMoments === 1 ? "memory" : "memories"} />
         </motion.div>
 
-        {/* Share card button */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.95, duration: 0.6 }}
-          className="mt-8"
-        >
-          <ShareCardModal couple={couple} totalMoments={totalMoments} />
-        </motion.div>
       </div>
 
       {/* Scroll cue */}
