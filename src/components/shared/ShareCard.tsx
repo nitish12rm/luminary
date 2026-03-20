@@ -22,22 +22,22 @@ const CARD_THEMES: Record<string, ThemePal> = {
   blush: {
     bgA: "#fef6f8", bgB: "#fde8f0", bgC: "#ede0ff",
     accent: "#e8789a", text: "#2d1520", muted: "#7a5468",
-    panelBg: "rgba(255,248,252,0.82)", panelBorder: "rgba(232,120,154,0.22)",
-    qrPanelBg: "rgba(255,255,255,0.38)",
+    panelBg: "rgba(255,244,249,0.94)", panelBorder: "rgba(232,120,154,0.22)",
+    qrPanelBg: "rgba(255,250,253,0.7)",
     isDark: false,
   },
   golden: {
     bgA: "#fffbf0", bgB: "#fff0c0", bgC: "#ffe4b0",
     accent: "#d4a017", text: "#2a1f00", muted: "#7a5a20",
-    panelBg: "rgba(255,252,240,0.82)", panelBorder: "rgba(212,160,23,0.22)",
-    qrPanelBg: "rgba(255,255,255,0.38)",
+    panelBg: "rgba(255,251,236,0.94)", panelBorder: "rgba(212,160,23,0.22)",
+    qrPanelBg: "rgba(255,252,240,0.7)",
     isDark: false,
   },
   velvet: {
     bgA: "#06060f", bgB: "#0a0818", bgC: "#04040c",
     accent: "#9b5fe0", text: "#dcdce8", muted: "#a8a8c0",
     panelBg: "rgba(4,4,14,0.97)", panelBorder: "rgba(155,95,224,0.3)",
-    qrPanelBg: "rgba(155,95,224,0.18)",
+    qrPanelBg: "rgba(30,12,60,0.9)",
     isDark: true,
   },
 };
@@ -80,6 +80,7 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
       const dataUrl = await toPng(cardRef.current, {
         pixelRatio: 3,
         cacheBust: true,
+        fetchRequestInit: { cache: "no-cache" },
       });
       const link = document.createElement("a");
       link.download = `${couple.partner1Name}-${couple.partner2Name}-luminary.png`;
@@ -250,8 +251,6 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             width: "63%", padding: "7%",
             background: pal.panelBg,
             borderRight: `1px solid ${pal.panelBorder}`,
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
           }}
         >
           <div style={{
@@ -316,7 +315,6 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
           className="absolute inset-y-0 right-0 flex flex-col items-center justify-center"
           style={{
             width: "35%", background: pal.qrPanelBg,
-            backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
             borderLeft: `1px solid ${pal.panelBorder}`,
             gap: "clamp(6px, 1.5vw, 14px)", padding: "5%",
           }}
@@ -338,6 +336,7 @@ const CardPreview = forwardRef<HTMLDivElement, PreviewProps>(
             <img
               src={`/api/qr?url=${encodeURIComponent(journeyUrl)}`}
               alt="QR code"
+              crossOrigin="anonymous"
               style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
             />
           </div>
