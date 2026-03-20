@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-export type LayoutId = "editorial" | "cinematic" | "story" | "reel" | "chapters";
+export type LayoutId = "editorial" | "story" | "chapters";
 
 interface LayoutOption {
   id: LayoutId;
@@ -12,11 +12,9 @@ interface LayoutOption {
 }
 
 const OPTIONS: LayoutOption[] = [
-  { id: "editorial", label: "Editorial",  icon: "✦",  desc: "Clean text-reveal columns" },
-  { id: "cinematic", label: "Cinematic",  icon: "◈",  desc: "Full-bleed parallax photos" },
-  { id: "story",     label: "Story",      icon: "◎",  desc: "Sticky split scrollytelling" },
-  { id: "reel",      label: "Reel",       icon: "▷",  desc: "Horizontal film strip" },
-  { id: "chapters",  label: "Chapters",   icon: "◗",  desc: "Grouped by year" },
+  { id: "editorial", label: "Editorial", icon: "✦", desc: "Clean text-reveal columns" },
+  { id: "story",     label: "Story",     icon: "◎", desc: "Sticky split scrollytelling" },
+  { id: "chapters",  label: "Chapters",  icon: "◗", desc: "Grouped by year" },
 ];
 
 interface Props {

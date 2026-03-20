@@ -5,9 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IMoment, ICouple } from "@/types";
 import LayoutPicker, { LayoutId } from "./LayoutPicker";
 import EditorialLayout from "./layouts/EditorialLayout";
-import CinematicLayout from "./layouts/CinematicLayout";
 import StoryLayout     from "./layouts/StoryLayout";
-import ReelLayout      from "./layouts/ReelLayout";
 import ChaptersLayout  from "./layouts/ChaptersLayout";
 
 interface Props {
@@ -20,7 +18,7 @@ const LS_KEY = "luminary_layout";
 function getStoredLayout(): LayoutId {
   if (typeof window === "undefined") return "editorial";
   const v = window.localStorage.getItem(LS_KEY);
-  const valid: LayoutId[] = ["editorial", "cinematic", "story", "reel", "chapters"];
+  const valid: LayoutId[] = ["editorial", "story", "chapters"];
   return valid.includes(v as LayoutId) ? (v as LayoutId) : "editorial";
 }
 
@@ -95,9 +93,7 @@ export default function Timeline({ moments, couple }: Props) {
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
           {layout === "editorial" && <EditorialLayout moments={moments} couple={couple} />}
-          {layout === "cinematic" && <CinematicLayout moments={moments} couple={couple} />}
           {layout === "story"     && <StoryLayout     moments={moments} couple={couple} />}
-          {layout === "reel"      && <ReelLayout      moments={moments} couple={couple} />}
           {layout === "chapters"  && <ChaptersLayout  moments={moments} couple={couple} />}
         </motion.div>
       </AnimatePresence>
