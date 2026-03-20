@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
 import { ICouple } from "@/types";
 import { formatDate, getDays } from "@/lib/utils";
@@ -38,7 +39,7 @@ export default function JourneyHero({ couple, totalMoments }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             className="w-32 h-32 rounded-full mx-auto mb-6 overflow-hidden ring-4"
-            style={{ ringColor: "var(--accent-1)" }}
+            style={{ "--tw-ring-color": "var(--accent-1)" } as React.CSSProperties}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
