@@ -1,0 +1,134 @@
+{
+  "couple": {
+    "_id": "664a1b2c3d4e5f6a7b8c9d0e",
+    "accessCode": "sofia-and-aryan",
+    "partner1Name": "Sofia",
+    "partner2Name": "Aryan",
+    "startDate": "2022-11-14T00:00:00.000Z",
+    "theme": "blush",
+    "coverPhotoPath": null,
+    "bio": "Two strangers who became each other's favourite person.",
+    "createdAt": "2024-06-15T10:30:00.000Z",
+    "updatedAt": "2024-06-15T10:30:00.000Z"
+  },
+
+  "moments": [
+    {
+      "_id": "664b0001aabbcc112233aa01",
+      "coupleId": "664a1b2c3d4e5f6a7b8c9d0e",
+      "category": "first_meeting",
+      "customLabel": "",
+      "date": "2022-08-03T00:00:00.000Z",
+      "rawDescription": "We met at Priya's birthday party. He was standing near the window talking to someone, and I accidentally spilled my drink near him. He laughed instead of being annoyed and offered me a napkin. We talked for 3 hours straight that night.",
+      "poeticNarrative": "You found each other the way most beautiful things are found — by accident. A tilted glass, a startled laugh, and then three hours dissolved without either of you noticing the room empty around you. He offered a napkin; what you didn't know then was that he was also offering something far harder to hand back.",
+      "photoPath": "/uploads/664a1b2c3d4e5f6a7b8c9d0e/moment-001.jpg",
+      "photoAlt": "Priya's birthday party",
+      "order": 0,
+      "createdAt": "2024-06-15T10:31:00.000Z"
+    },
+    {
+      "_id": "664b0002aabbcc112233aa02",
+      "coupleId": "664a1b2c3d4e5f6a7b8c9d0e",
+      "category": "first_conversation",
+      "customLabel": "",
+      "date": "2022-08-10T00:00:00.000Z",
+      "rawDescription": "He texted me a week after the party asking if I wanted to talk more. We ended up on a call from 10pm until 3am. We talked about our families, our fears, what we wanted from life. It felt like talking to someone I'd known forever.",
+      "poeticNarrative": "Seven days after the party, his name lit up your screen with the quietest kind of courage — a simple ask to continue what the night had started. By the time 3am arrived, you had crossed the small talk entirely and wandered into each other's fears, dreams, and the tender edges of who you were still becoming. Some conversations end; this one only paused.",
+      "photoPath": null,
+      "photoAlt": "",
+      "order": 1,
+      "createdAt": "2024-06-15T10:32:00.000Z"
+    },
+    {
+      "_id": "664b0003aabbcc112233aa03",
+      "coupleId": "664a1b2c3d4e5f6a7b8c9d0e",
+      "category": "first_walk",
+      "customLabel": "",
+      "date": "2022-09-04T00:00:00.000Z",
+      "rawDescription": "We went for a walk at Lodhi Garden on a Sunday morning. It was supposed to be 30 minutes but we walked for almost 3 hours. He bought me chai from a stall outside. We sat on the grass and he told me about his grandfather. I remember the light was really golden that morning.",
+      "poeticNarrative": "Thirty minutes was the plan; three hours was what you gave each other without realising. The garden was unhurried and golden that morning, the kind of light that slows time on purpose, and somewhere between the chai he bought you and the story of his grandfather, the walk became something else — a soft rehearsal for all the mornings that would follow.",
+      "photoPath": "/uploads/664a1b2c3d4e5f6a7b8c9d0e/moment-003.jpg",
+      "photoAlt": "Lodhi Garden morning walk",
+      "order": 2,
+      "createdAt": "2024-06-15T10:33:00.000Z"
+    },
+    {
+      "_id": "664b0004aabbcc112233aa04",
+      "coupleId": "664a1b2c3d4e5f6a7b8c9d0e",
+      "category": "knowing_feelings",
+      "customLabel": "",
+      "date": "2022-10-17T00:00:00.000Z",
+      "rawDescription": "I was sick and he showed up at my door with soup and paracetamol without me asking. He sat with me for four hours, made me soup twice, and left only when I fell asleep. I remember watching him from under the blanket and thinking — oh no, I'm in trouble.",
+      "poeticNarrative": "You hadn't asked him to come, yet there he was at your door with soup and paracetamol, carrying the quiet certainty of someone who simply knew. He sat with you for four hours and remade the soup without being told to, and when you watched him from beneath the blanket — unhurried, unasked, just there — you felt the ground shift in the gentlest, most irreversible way.",
+      "photoPath": null,
+      "photoAlt": "",
+      "order": 3,
+      "createdAt": "2024-06-15T10:34:00.000Z"
+    },
+    {
+      "_id": "664b0005aabbcc112233aa05",
+      "coupleId": "664a1b2c3d4e5f6a7b8c9d0e",
+      "category": "proposal",
+      "customLabel": "",
+      "date": "2022-11-14T00:00:00.000Z",
+      "rawDescription": "It wasn't dramatic. We were on the rooftop of his building at night with fairy lights. He said he didn't know how to do big gestures but he knew he wanted to keep choosing me every day. Then he asked if I'd be his girlfriend. I said yes before he even finished the sentence.",
+      "poeticNarrative": "He had told you once that he wasn't made for grand gestures, and so he gave you something rarer: the rooftop dressed in quiet fairy light, and words that asked for nothing but the chance to keep choosing you. You didn't let him finish the sentence — some answers don't need the question to land before they're already certain.",
+      "photoPath": "/uploads/664a1b2c3d4e5f6a7b8c9d0e/moment-005.jpg",
+      "photoAlt": "Rooftop with fairy lights",
+      "order": 4,
+      "createdAt": "2024-06-15T10:35:00.000Z"
+    },
+    {
+      "_id": "664b0006aabbcc112233aa06",
+      "coupleId": "664a1b2c3d4e5f6a7b8c9d0e",
+      "category": "first_kiss",
+      "customLabel": "",
+      "date": "2022-11-14T00:00:00.000Z",
+      "rawDescription": "Same night, same rooftop. After he asked me to be his girlfriend, there was this moment of silence and then we just knew. It felt like the most natural thing in the world.",
+      "poeticNarrative": "The silence that followed his question was not awkward — it was full, the way a held breath is full before something true is exhaled. On the same rooftop, under the same lights, the two of you closed the small remaining distance between who you had been and who you were becoming. It felt like the most natural thing in the world, because by then, it was.",
+      "photoPath": null,
+      "photoAlt": "",
+      "order": 5,
+      "createdAt": "2024-06-15T10:36:00.000Z"
+    },
+    {
+      "_id": "664b0007aabbcc112233aa07",
+      "coupleId": "664a1b2c3d4e5f6a7b8c9d0e",
+      "category": "first_date",
+      "customLabel": "",
+      "date": "2022-11-20T00:00:00.000Z",
+      "rawDescription": "Our first official date was at this small Italian place in Hauz Khas. He had reserved the corner table. We shared a pasta, argued about whether pineapple on pizza is okay (he said yes, I said absolutely not), and laughed so much the people next to us kept looking over. Best dinner of my life.",
+      "poeticNarrative": "He had reserved the corner table — a quiet, deliberate act that said more than he knew — and the evening unfolded in pasta shared and an argument about pineapple that neither of you intended to win. The people beside you kept glancing over, drawn by the laughter that filled more space than you'd realised you were allowed to take up. You drove home already half in love with ordinary evenings spent exactly like this.",
+      "photoPath": "/uploads/664a1b2c3d4e5f6a7b8c9d0e/moment-007.jpg",
+      "photoAlt": "Italian dinner at Hauz Khas",
+      "order": 6,
+      "createdAt": "2024-06-15T10:37:00.000Z"
+    },
+    {
+      "_id": "664b0008aabbcc112233aa08",
+      "coupleId": "664a1b2c3d4e5f6a7b8c9d0e",
+      "category": "first_fight",
+      "customLabel": "",
+      "date": "2023-01-09T00:00:00.000Z",
+      "rawDescription": "It was stupid. I was upset that he cancelled plans to help a friend and didn't tell me until the last minute. He thought I was being unreasonable. We didn't talk for two days. He finally called and said sorry for not communicating. I said sorry for shutting down. We were both right and both wrong.",
+      "poeticNarrative": "The thing about a first fight is that you don't yet know you'll survive it — that underneath the two days of silence, the shape of what you had built was still holding. He called first; you met him halfway; and in the exchange of two apologies you learned something you couldn't have otherwise: that you both had enough care left over, even when it was fraying, to find your way back.",
+      "photoPath": null,
+      "photoAlt": "",
+      "order": 7,
+      "createdAt": "2024-06-15T10:38:00.000Z"
+    },
+    {
+      "_id": "664b0009aabbcc112233aa09",
+      "coupleId": "664a1b2c3d4e5f6a7b8c9d0e",
+      "category": "custom",
+      "customLabel": "First Trip Together",
+      "date": "2023-04-22T00:00:00.000Z",
+      "rawDescription": "We went to Rishikesh for a long weekend. Our first trip together. We did river rafting, ate at this tiny dhaba, and stayed in a wooden cottage by the Ganga. On the last night he said this is what he wants his life to feel like. I cried a little. Don't tell him.",
+      "poeticNarrative": "Rishikesh in April, a wooden cottage beside the river, and the Ganga moving through it all with complete indifference to how much was quietly being decided. You rafted and laughed and ate at a dhaba where the dal was better than anything, and on the last night he said aloud what you had both been feeling — that this, all of this, was exactly the shape he wanted his life to take. You cried a little. The river kept its secrets; so shall this.",
+      "photoPath": "/uploads/664a1b2c3d4e5f6a7b8c9d0e/moment-009.jpg",
+      "photoAlt": "Rishikesh — Ganga riverfront",
+      "order": 8,
+      "createdAt": "2024-06-15T10:39:00.000Z"
+    }
+  ]
+}
