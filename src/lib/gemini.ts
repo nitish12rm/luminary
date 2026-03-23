@@ -24,7 +24,7 @@ export async function enhanceMoment(params: {
   const model = ai.getGenerativeModel({
     model: modelName,
     generationConfig: {
-      temperature: 0.85,
+      temperature: 0.6,
       topP: 0.9,
       maxOutputTokens: 300,
     },
@@ -42,24 +42,23 @@ export async function enhanceMoment(params: {
     custom: "A special memory",
   };
 
-  const prompt = `You are a romantic storyteller writing intimate, literary vignettes for a couple's personal journal.
-Transform this raw memory into a beautifully written, poetic narrative (3–4 sentences).
+  const prompt = `You are helping a couple capture a memory in their personal journal. Your job is to gently polish what they wrote — keeping their voice, their words, and their feeling intact. Just make it a little sweeter and cleaner.
 
 Rules:
-- Write in second-person plural: "you both", "the two of you", "together you"
-- Use sensory, evocative language — what was seen, felt, heard
-- Stay true to the original memory — do not invent facts
-- Tone: warm, intimate, literary — timeless and tender
-- Avoid clichés like "butterflies in stomach", "love at first sight", "heart skipped a beat"
-- Length: exactly 3–4 sentences, no more, no less
-- Do NOT use the word "timeless" or "journey"
+- Keep the same tone and energy as the original message — if it's playful, keep it playful; if it's soft and tender, keep it that way
+- Do NOT make it poetic, dramatic, or Shakespearean — write the way real people talk to each other
+- Use second-person plural naturally: "you both", "the two of you" — only where it feels right
+- Stay 100% true to the original memory — do not add or invent anything
+- Fix grammar and flow only if needed, otherwise leave the phrasing as close to the original as possible
+- Length: match the original length, give or take a sentence
+- No fancy vocabulary, no metaphors, no literary flair — just warm and real
 
 Partners: ${params.partner1} & ${params.partner2}
 Occasion: ${categoryLabels[params.category] || "A special moment"}
 Date: ${params.date}
 Raw memory: ${params.description}
 
-Write only the narrative, nothing else:`;
+Write only the polished memory, nothing else:`;
 
   const result = await model.generateContent(prompt);
   const text = result.response.text().trim();
