@@ -51,11 +51,12 @@ export async function POST(req: NextRequest) {
     const fileName = `luminary/${coupleId || "general"}/${Date.now()}.${ext}`;
 
     const blob = await put(fileName, compressed, {
-      access: "public",
+      access: "private",
       contentType,
     });
 
-    return NextResponse.json({ path: blob.url });
+    const proxyUrl = `/api/image?url=${encodeURIComponent(blob.url)}`;
+    return NextResponse.json({ path: proxyUrl });
   } catch (err) {
     console.error("[upload]", err);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
