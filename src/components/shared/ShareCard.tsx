@@ -78,7 +78,7 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
     setDownloading(true);
     try {
       const dataUrl = await toPng(cardRef.current, {
-        pixelRatio: 3,
+        pixelRatio: 5,
         cacheBust: true,
         fetchRequestInit: { cache: "no-cache" },
       });
