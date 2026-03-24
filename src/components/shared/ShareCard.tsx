@@ -54,7 +54,7 @@ interface Props {
    ShareCard — preview + download
    ══════════════════════════════════════════════ */
 export default function ShareCard({ couple, totalMoments, activeTheme }: Props) {
-  const [downloading, setDownloading] = useState(false);
+  const [downloading, setDownloading] = useState<"standard" | "visiting" | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const pal = CARD_THEMES[activeTheme ?? couple.theme] ?? CARD_THEMES.blush;
@@ -72,24 +72,81 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
       ? `${window.location.origin}/journey/${couple.accessCode}`
       : `/journey/${couple.accessCode}`;
 
-  /* ── Download: snapshot the actual CardPreview DOM element ── */
+  /* ── Shared capture helper ── */
+  const captureCard = useCallback(async () => {
+    if (!cardRef.current) return null;
+    return toPng(cardRef.current, {
+      pixelRatio: 5,
+      cacheBust: true,
+      fetchRequestInit: { cache: "no-cache" },
+    });
+  }, [cardRef]);
+
+  /* ── 9:5 standard download ── */
   const handleDownload = useCallback(async () => {
-    if (!cardRef.current) return;
-    setDownloading(true);
+    setDownloading("standard");
     try {
-      const dataUrl = await toPng(cardRef.current, {
-        pixelRatio: 5,
-        cacheBust: true,
-        fetchRequestInit: { cache: "no-cache" },
-      });
+      const dataUrl = await captureCard();
+      if (!dataUrl) return;
       const link = document.createElement("a");
       link.download = `${couple.partner1Name}-${couple.partner2Name}-luminary.png`;
       link.href = dataUrl;
       link.click();
     } finally {
-      setDownloading(false);
+      setDownloading(null);
     }
-  }, [couple, cardRef]);
+  }, [couple, captureCard]);
+
+  /* ── 3.5"×2" visiting card download (600 DPI = 2100×1200px) ── */
+  const handleDownloadVisiting = useCallback(async () => {
+    setDownloading("visiting");
+    try {
+      const dataUrl = await captureCard();
+      if (!dataUrl) return;
+
+      const PRINT_W = 2100; // 3.5" × 600 DPI
+      const PRINT_H = 1200; // 2.0" × 600 DPI
+
+      const img = new Image();
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = dataUrl;
+      });
+
+      const canvas = document.createElement("canvas");
+      canvas.width = PRINT_W;
+      canvas.height = PRINT_H;
+      const ctx = canvas.getContext("2d")!;
+
+      ctx.fillStyle = pal.bgA;
+      ctx.fillRect(0, 0, PRINT_W, PRINT_H);
+
+      const scale = Math.min(PRINT_W / img.width, PRINT_H / img.height);
+      const drawW = img.width * scale;
+      const drawH = img.height * scale;
+      ctx.drawImage(img, (PRINT_W - drawW) / 2, (PRINT_H - drawH) / 2, drawW, drawH);
+
+      const link = document.createElement("a");
+      link.download = `${couple.partner1Name}-${couple.partner2Name}-luminary-visiting.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } finally {
+      setDownloading(null);
+    }
+  }, [couple, captureCard, pal]);
+
+  const DownloadIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+
+  const Spinner = () => (
+    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin inline-block" />
+  );
 
   return (
     <>
@@ -103,31 +160,31 @@ export default function ShareCard({ couple, totalMoments, activeTheme }: Props) 
         journeyUrl={journeyUrl}
       />
 
-      {/* Download button — inherits theme accent */}
-      <motion.button
-        onClick={handleDownload}
-        disabled={downloading}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
-        className="btn-accent mt-6 mx-auto flex items-center gap-2.5"
-        style={{ paddingLeft: "2rem", paddingRight: "2rem", paddingTop: "0.85rem", paddingBottom: "0.85rem" }}
-      >
-        {downloading ? (
-          <>
-            <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin inline-block" />
-            Generating...
-          </>
-        ) : (
-          <>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Download Card
-          </>
-        )}
-      </motion.button>
+      <div className="mt-6 mx-auto flex gap-3">
+        {/* 9:5 format */}
+        <motion.button
+          onClick={handleDownload}
+          disabled={downloading !== null}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          className="btn-accent flex items-center gap-2.5"
+          style={{ paddingLeft: "1.5rem", paddingRight: "1.5rem", paddingTop: "0.85rem", paddingBottom: "0.85rem" }}
+        >
+          {downloading === "standard" ? <><Spinner /> Generating...</> : <><DownloadIcon /> 9:5 Format</>}
+        </motion.button>
+
+        {/* Visiting card format */}
+        <motion.button
+          onClick={handleDownloadVisiting}
+          disabled={downloading !== null}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          className="btn-accent flex items-center gap-2.5"
+          style={{ paddingLeft: "1.5rem", paddingRight: "1.5rem", paddingTop: "0.85rem", paddingBottom: "0.85rem" }}
+        >
+          {downloading === "visiting" ? <><Spinner /> Generating...</> : <><DownloadIcon /> Visiting Card</>}
+        </motion.button>
+      </div>
     </>
   );
 }

@@ -19,6 +19,7 @@ export interface CoupleForm {
   bio: string;
   theme: ThemeId;
   accessCode: string;
+  pin: string;
 }
 
 const TOTAL_STEPS = 4;
@@ -52,6 +53,7 @@ export default function SetupWizard() {
     bio: "",
     theme: "blush",
     accessCode: "",
+    pin: "",
   });
   const [moments, setMoments] = useState<MomentDraft[]>([]);
 

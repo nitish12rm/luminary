@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import crypto from "crypto";
 import type { Metadata } from "next";
 import connectDB from "@/lib/mongodb";
 import Couple from "@/models/Couple";
@@ -9,6 +11,12 @@ import ThemeSwitcher from "@/components/shared/ThemeSwitcher";
 import JourneyHero from "@/components/journey/JourneyHero";
 import Timeline from "@/components/journey/Timeline";
 import ParticleField from "@/components/journey/ParticleField";
+import PinGate from "@/components/journey/PinGate";
+
+function makeCookieToken(accessCode: string) {
+  const secret = process.env.COOKIE_SECRET || "luminary-pin-secret";
+  return crypto.createHmac("sha256", secret).update(accessCode).digest("hex");
+}
 
 interface Props {
   params: { code: string };
@@ -51,6 +59,28 @@ export default async function JourneyPage({ params }: Props) {
   if (!data) notFound();
 
   const { couple, moments } = data;
+
+  // PIN gate check
+  if (couple.pin) {
+    const cookieStore = cookies();
+    const cookieVal = cookieStore.get(`lum_pin_${params.code}`)?.value;
+    const expected = makeCookieToken(params.code);
+    const unlocked = cookieVal
+      ? crypto.timingSafeEqual(Buffer.from(cookieVal), Buffer.from(expected))
+      : false;
+
+    if (!unlocked) {
+      return (
+        <ThemeProvider theme={couple.theme} coupleId={couple._id}>
+          <PinGate
+            code={params.code}
+            partner1={couple.partner1Name}
+            partner2={couple.partner2Name}
+          />
+        </ThemeProvider>
+      );
+    }
+  }
 
   return (
     <ThemeProvider theme={couple.theme} coupleId={couple._id}>
