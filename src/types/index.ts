@@ -20,6 +20,7 @@ export interface ICouple {
   theme: ThemeId;
   coverPhotoPath?: string;
   bio?: string;
+  pin?: string;
   createdAt: string;
 }
 

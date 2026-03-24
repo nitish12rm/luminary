@@ -9,6 +9,7 @@ export interface ICoupleDocument extends Document {
   theme: ThemeId;
   coverPhotoPath?: string;
   bio?: string;
+  pin?: string;
   createdAt: Date;
 }
 
@@ -32,6 +33,7 @@ const CoupleSchema = new Schema<ICoupleDocument>(
     },
     coverPhotoPath: { type: String, default: null },
     bio: { type: String, maxlength: 500, default: "" },
+    pin: { type: String, default: null },
   },
   { timestamps: true }
 );

@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Couple from "@/models/Couple";
 import Moment from "@/models/Moment";
+import crypto from "crypto";
+
+function hashPin(pin: string, accessCode: string) {
+  return crypto.createHash("sha256").update(`${pin}:${accessCode}`).digest("hex");
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,20 +20,22 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     // Check code availability
-    const existing = await Couple.findOne({ accessCode: coupleData.accessCode.trim() });
+    const existing = await Couple.findOne({ accessCode: coupleData.accessCode?.trim() });
     if (existing) {
       return NextResponse.json({ error: "Access code already taken" }, { status: 409 });
     }
 
     // Create couple
+    const code = coupleData.accessCode.trim();
     const couple = await Couple.create({
-      accessCode: coupleData.accessCode.trim(),
+      accessCode: code,
       partner1Name: coupleData.partner1Name.trim(),
       partner2Name: coupleData.partner2Name.trim(),
       startDate: new Date(coupleData.startDate),
       theme: coupleData.theme || "blush",
       coverPhotoPath: coupleData.coverPhotoPath || null,
       bio: coupleData.bio || "",
+      pin: coupleData.pin ? hashPin(coupleData.pin, code) : null,
     });
 
     // Create moments if provided

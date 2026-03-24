@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CoupleForm } from "../SetupWizard";
 
 interface Props {
@@ -14,9 +14,18 @@ export default function Step3Code({ couple, updateCouple, onNext, onBack }: Prop
   const [confirm, setConfirm] = useState("");
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
+  const [pinDigits, setPinDigits] = useState(["", "", "", ""]);
+  const [pinConfirm, setPinConfirmDigits] = useState(["", "", "", ""]);
   const [error, setError] = useState("");
+  const pinRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
+  const pinConfirmRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
   const validateCode = (val: string) => /^[a-z0-9_-]{3,20}$/.test(val);
+
+  const pin = pinDigits.join("");
+  const pinConfirmStr = pinConfirm.join("");
+  const pinValid = pin.length === 4;
+  const pinMatch = pin === pinConfirmStr;
 
   async function checkAvailability(code: string) {
     if (!validateCode(code)) return;
@@ -29,7 +38,7 @@ export default function Step3Code({ couple, updateCouple, onNext, onBack }: Prop
         body: JSON.stringify({ code }),
       });
       const data = await res.json();
-      setAvailable(!data.valid); // available if NOT found
+      setAvailable(!data.valid);
     } catch {
       setAvailable(null);
     } finally {
@@ -37,10 +46,39 @@ export default function Step3Code({ couple, updateCouple, onNext, onBack }: Prop
     }
   }
 
+  function handlePinInput(
+    idx: number,
+    val: string,
+    digits: string[],
+    setDigits: (d: string[]) => void,
+    refs: React.RefObject<HTMLInputElement>[]
+  ) {
+    const digit = val.replace(/\D/g, "").slice(-1);
+    const next = [...digits];
+    next[idx] = digit;
+    setDigits(next);
+    updateCouple({ pin: idx < 3 ? couple.pin : next.join("") });
+    if (digit && idx < 3) refs[idx + 1].current?.focus();
+  }
+
+  function handlePinKeyDown(
+    e: React.KeyboardEvent,
+    idx: number,
+    digits: string[],
+    setDigits: (d: string[]) => void,
+    refs: React.RefObject<HTMLInputElement>[]
+  ) {
+    if (e.key === "Backspace" && !digits[idx] && idx > 0) {
+      refs[idx - 1].current?.focus();
+    }
+  }
+
   const isValid =
     validateCode(couple.accessCode) &&
     couple.accessCode === confirm &&
-    available === true;
+    available === true &&
+    pinValid &&
+    pinMatch;
 
   function handleNext() {
     if (!validateCode(couple.accessCode)) {
@@ -55,6 +93,15 @@ export default function Step3Code({ couple, updateCouple, onNext, onBack }: Prop
       setError("Code already taken, try another");
       return;
     }
+    if (!pinValid) {
+      setError("Enter a 4-digit PIN");
+      return;
+    }
+    if (!pinMatch) {
+      setError("PINs don't match");
+      return;
+    }
+    updateCouple({ pin });
     setError("");
     onNext();
   }
@@ -75,6 +122,7 @@ export default function Step3Code({ couple, updateCouple, onNext, onBack }: Prop
       </div>
 
       <div className="space-y-4">
+        {/* Access code */}
         <div>
           <label
             className="block text-xs font-medium mb-1.5 tracking-wide"
@@ -140,7 +188,78 @@ export default function Step3Code({ couple, updateCouple, onNext, onBack }: Prop
           />
           {confirm && couple.accessCode !== confirm && (
             <p className="text-xs mt-1" style={{ color: "var(--accent-2)" }}>
-              Codes don't match yet
+              Codes don&apos;t match yet
+            </p>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 py-1">
+          <div className="flex-1 h-px" style={{ background: "var(--border-strong)" }} />
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>PIN lock</span>
+          <div className="flex-1 h-px" style={{ background: "var(--border-strong)" }} />
+        </div>
+
+        {/* PIN */}
+        <div>
+          <label
+            className="block text-xs font-medium mb-1.5 tracking-wide"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Set a 4-digit PIN
+          </label>
+          <div className="flex gap-3 justify-center">
+            {pinDigits.map((d, i) => (
+              <input
+                key={i}
+                ref={pinRefs[i]}
+                type="password"
+                inputMode="numeric"
+                maxLength={1}
+                value={d}
+                onChange={(e) => handlePinInput(i, e.target.value, pinDigits, setPinDigits, pinRefs)}
+                onKeyDown={(e) => handlePinKeyDown(e, i, pinDigits, setPinDigits, pinRefs)}
+                className="themed-input text-center text-xl font-bold"
+                style={{ width: "3rem", padding: "0.5rem" }}
+              />
+            ))}
+          </div>
+          <p className="text-xs mt-1 text-center" style={{ color: "var(--text-muted)" }}>
+            Anyone with the QR link will need this PIN to view your story
+          </p>
+        </div>
+
+        <div>
+          <label
+            className="block text-xs font-medium mb-1.5 tracking-wide"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Confirm your PIN
+          </label>
+          <div className="flex gap-3 justify-center">
+            {pinConfirm.map((d, i) => (
+              <input
+                key={i}
+                ref={pinConfirmRefs[i]}
+                type="password"
+                inputMode="numeric"
+                maxLength={1}
+                value={d}
+                onChange={(e) => handlePinInput(i, e.target.value, pinConfirm, setPinConfirmDigits, pinConfirmRefs)}
+                onKeyDown={(e) => handlePinKeyDown(e, i, pinConfirm, setPinConfirmDigits, pinConfirmRefs)}
+                className="themed-input text-center text-xl font-bold"
+                style={{ width: "3rem", padding: "0.5rem" }}
+              />
+            ))}
+          </div>
+          {pinConfirmStr.length === 4 && !pinMatch && (
+            <p className="text-xs mt-1 text-center" style={{ color: "var(--accent-2)" }}>
+              PINs don&apos;t match
+            </p>
+          )}
+          {pinConfirmStr.length === 4 && pinMatch && (
+            <p className="text-xs mt-1 text-center" style={{ color: "#22c55e" }}>
+              ✓ PINs match
             </p>
           )}
         </div>
