@@ -39,6 +39,7 @@ function toCoupleForm(c: ICouple): CoupleForm {
     bio: c.bio || "",
     theme: c.theme,
     accessCode: c.accessCode,
+    pin: "",
   };
 }
 
